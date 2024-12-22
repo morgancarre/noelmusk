@@ -39,19 +39,17 @@ public class MainView extends VerticalLayout {
         setAlignItems(FlexComponent.Alignment.CENTER);
         var grid = new Grid<>(MastodonPost.class, false);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         
-        grid.setHeight("50%");
-        
+        // Créer le composant HTML pour afficher le contenu
         var contentDiv = new Div();
         contentDiv.setWidthFull();
-        contentDiv.setHeight("50%");
         contentDiv.getStyle()
                 .set("padding", "1em")
                 .set("background-color", "var(--lumo-contrast-5pct)");
 
         addLineNumberColumn(grid);
         addTagsColumn(grid);
+        addRepliesColumn(grid);
         addContentColumn(grid);
         
         grid.setItemDetailsRenderer(new ComponentRenderer<>(post -> new Div(Jsoup.parse(post.getContent()).text())));
@@ -66,20 +64,20 @@ public class MainView extends VerticalLayout {
                 return;
             }
             String text = v.getValue().trim();
-            if (text.startsWith("exp")) {
+            if (text.startsWith("goto ")) {
                 closeAll(grid);
                 String id = text.substring(3).trim();
                 if (!id.isEmpty()) {
                     var post = findPostById(grid, Integer.parseInt(id));
                     grid.setDetailsVisible(post, true);
                 }
-            } else if (text.startsWith("h")) {
+            } else if (text.startsWith("hashtag ") || text.startsWith("h ")) {
                 String tag = text.substring(1).trim();
                 grid.setItems(fetchPostsFromTag(tag));
                 grid.getDataProvider().fetch(new Query<>()).findFirst().ifPresent(firstItem -> {
                     grid.select(firstItem);
                 });
-            } else if (text.equals("n")) {
+            } else if (text.equals("next") || text.equals("n")) {
                 // Sélectionne la ligne suivante
                 MastodonPost currentSelection = grid.getSelectedItems().stream().findFirst().orElse(null);
                 List<MastodonPost> items = grid.getDataProvider().fetch(new Query<>()).collect(Collectors.toList());
@@ -91,7 +89,7 @@ public class MainView extends VerticalLayout {
                 } else if (!items.isEmpty()) {
                     grid.select(items.get(0));
                 }
-            } else if (text.equals("p")) {
+            } else if (text.equals("previous") || text.equals("p")) {
                 // Sélectionne la ligne précédente
                 MastodonPost currentSelection = grid.getSelectedItems().stream().findFirst().orElse(null);
                 List<MastodonPost> items = grid.getDataProvider().fetch(new Query<>()).collect(Collectors.toList());
@@ -118,19 +116,9 @@ public class MainView extends VerticalLayout {
         
         add(promptContainer);
         
-        setFlexGrow(0.5, grid);
-        setFlexGrow(0.5, contentDiv);
+        setFlexGrow(1, grid);
+        setFlexGrow(0, contentDiv);
         setFlexGrow(0, promptContainer);
-    }
-
-    private void selectItemListener(Grid<MastodonPost> grid, Div contentDiv,
-            SelectionEvent<Grid<MastodonPost>, MastodonPost> event) {
-        // Ferme tous les détails
-        closeAll(grid);
-        // Met à jour le contenu HTML
-        event.getFirstSelectedItem().ifPresent(post -> {
-            contentDiv.getElement().setProperty("innerHTML", post.getContent());
-        });
     }
 
     private void addLineNumberColumn(Grid<MastodonPost> grid) {
@@ -168,6 +156,12 @@ public class MainView extends VerticalLayout {
             }
             return tagContainer;
         })).setAutoWidth(true);
+    }
+
+    private void addRepliesColumn(Grid<MastodonPost> grid) {
+        grid.addColumn(post -> post.getRepliesCount())
+                .setWidth("7em")
+                .setFlexGrow(0);
     }
 
     private void addContentColumn(Grid<MastodonPost> grid) {
@@ -223,5 +217,16 @@ public class MainView extends VerticalLayout {
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void selectItemListener(Grid<MastodonPost> grid, Div contentDiv,
+            SelectionEvent<Grid<MastodonPost>, MastodonPost> event) {
+        // Ferme tous les détails
+        closeAll(grid);
+        // Met à jour le contenu HTML et expande la ligne sélectionnée
+        event.getFirstSelectedItem().ifPresent(post -> {
+            contentDiv.getElement().setProperty("innerHTML", post.getContent());
+            grid.setDetailsVisible(post, true);
+        });
     }
 }
