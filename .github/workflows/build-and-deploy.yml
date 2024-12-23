@@ -35,13 +35,6 @@ jobs:
     - name: Build JAR with Maven
       run: mvn clean package -Pproduction -Dvaadin.force.production.build=true -DskipTests
 
-    # Upload the JAR as an artifact (optional)
-    - name: Upload JAR as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: my-app-jar
-        path: target/*.jar
-
     # Verify the contents of the target directory
     - name: List target directory
       run: ls -la target/
@@ -55,5 +48,7 @@ jobs:
         key: ${{ secrets.REMOTE_SSH_KEY }}
         port: 22
         script: |
+          # Vérifier que le fichier existe avant de tenter de le transférer
+          ls -al target/
           scp target/antix-1.0-SNAPSHOT.jar ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
 
