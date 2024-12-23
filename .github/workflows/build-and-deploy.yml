@@ -35,10 +35,6 @@ jobs:
     - name: Build JAR with Maven
       run: mvn clean package -Pproduction -Dvaadin.force.production.build=true -DskipTests
 
-    # Verify the contents of the target directory
-    - name: List target directory
-      run: ls -la target/
-
     # Deploy the JAR to the remote server via SSH
     - name: Deploy JAR to remote server
       uses: appleboy/ssh-action@v0.1.6
@@ -48,7 +44,7 @@ jobs:
         key: ${{ secrets.REMOTE_SSH_KEY }}
         port: 22
         script: |
-          # Vérifier que le fichier existe avant de tenter de le transférer
           ls -al target/
+          ls -al
           scp target/antix-1.0-SNAPSHOT.jar ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
 
