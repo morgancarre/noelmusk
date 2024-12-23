@@ -1,0 +1,17 @@
+logging:
+  level:
+    org.atmosphere: warn
+
+spring:
+  mustache:
+    check-template-location: false
+  jpa:
+    defer-datasource-initialization: true
+
+vaadin:
+  launch-browser: true
+  allowed-packages: 
+    - com.vaadin
+    - org.vaadin
+    - com
+  productionMode: false
