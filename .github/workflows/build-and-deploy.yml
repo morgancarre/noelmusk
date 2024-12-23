@@ -34,6 +34,15 @@ jobs:
     # Build the JAR using Maven
     - name: Build JAR with Maven
       run: mvn clean package -Pproduction -Dvaadin.force.production.build=true -DskipTests -DfinalName=tweetx -DfinalName=tweetx.jar
+    
+    - name: Check for JAR file
+      run: |
+        if ls ./target/*.jar 1> /dev/null 2>&1; then
+          echo "JAR file exists.";
+        else
+          echo "JAR file not found. Exiting.";
+          exit 1;
+        fi
 
     # Deploy the JAR to the remote server via SSH
     - name: Deploy JAR to remote server
@@ -43,6 +52,6 @@ jobs:
         USERNAME: ${{ secrets.REMOTE_USER }}
         KEY: ${{ secrets.REMOTE_SSH_KEY }}
       with:
-        source: "./target/*.jar"
+        source: "./target"
         target: "/opt/tweetx/"
      
