@@ -51,7 +51,5 @@ jobs:
         key: ${{ secrets.REMOTE_SSH_KEY }}
         port: 22
         script: |
-          mkdir -p /opt/tweetx
           scp target/*.jar ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
-          # Restart your application using systemd
-          systemctl restart tweetx.service
+
