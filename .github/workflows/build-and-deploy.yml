@@ -35,7 +35,7 @@ jobs:
     
     - name: Check for JAR file
       run: |
-        ls
+        ls ./target/
         if ls ./target/*.jar 1> /dev/null 2>&1; then
           echo "JAR file exists.";
         else
@@ -47,7 +47,7 @@ jobs:
     - name: Deploy JAR to remote server
       uses: appleboy/scp-action@master
       with:
-        host: ${{ secrets.HOST }}
+        host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_SSH_KEY }}
         source: "./target"
