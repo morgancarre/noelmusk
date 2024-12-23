@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '21'
-        distribution: 'adoptopenjdk'
+        distribution: 'adoptium'
 
     # Cache dependencies to speed up the build process
     - name: Cache Maven dependencies
