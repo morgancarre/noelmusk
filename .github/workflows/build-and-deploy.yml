@@ -55,5 +55,5 @@ jobs:
         key: ${{ secrets.REMOTE_SSH_KEY }}
         port: 22
         script: |
-          scp target/*.jar ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
+          scp target/antix-1.0-SNAPSHOT.jar ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
 
