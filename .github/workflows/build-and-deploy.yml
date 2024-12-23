@@ -46,5 +46,7 @@ jobs:
         script: |
           ls -al target/
           ls -al
+          pwd
+          ls -la /home/runner/work/noelmusk/noelmusk/target/
           scp target/antix-1.0-SNAPSHOT.jar ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
 
