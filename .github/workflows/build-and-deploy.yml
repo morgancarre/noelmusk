@@ -49,7 +49,7 @@ jobs:
       with:
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
-        password: ${{ secrets.REMOTE_SSH_KEY }}
+        key: ${{ secrets.REMOTE_SSH_KEY }}
         source: "./target"
         target: "/opt/tweetx/"
      
