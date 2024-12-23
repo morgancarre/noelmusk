@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.Query;
@@ -43,12 +44,9 @@ public class MainView extends VerticalLayout {
         // Créer le composant HTML pour afficher le contenu
         var contentDiv = new Div();
         contentDiv.setWidthFull();
-        contentDiv.getStyle()
-                .set("padding", "1em")
-                .set("background-color", "var(--lumo-contrast-5pct)");
 
-        addLineNumberColumn(grid);
-        addTagsColumn(grid);
+        //addLineNumberColumn(grid);
+       // addTagsColumn(grid);
         addRepliesColumn(grid);
         addContentColumn(grid);
         
@@ -64,14 +62,15 @@ public class MainView extends VerticalLayout {
                 return;
             }
             String text = v.getValue().trim();
-            if (text.startsWith("goto ")) {
-                closeAll(grid);
-                String id = text.substring(3).trim();
-                if (!id.isEmpty()) {
-                    var post = findPostById(grid, Integer.parseInt(id));
-                    grid.setDetailsVisible(post, true);
-                }
-            } else if (text.startsWith("hashtag ") || text.startsWith("h ")) {
+            // if (text.startsWith("goto ")) {
+            //     closeAll(grid);
+            //     String id = text.substring(3).trim();
+            //     if (!id.isEmpty()) {
+            //         var post = findPostById(grid, Integer.parseInt(id));
+            //         grid.setDetailsVisible(post, true);
+            //     }
+            // } else
+             if (text.startsWith("hashtag ") || text.startsWith("h ")) {
                 String tag = text.substring(1).trim();
                 grid.setItems(fetchPostsFromTag(tag));
                 grid.getDataProvider().fetch(new Query<>()).findFirst().ifPresent(firstItem -> {
@@ -105,19 +104,34 @@ public class MainView extends VerticalLayout {
             internalChange.set(false);
         });
 
-        add(grid);
-        add(contentDiv);
+        // Créer un HorizontalLayout pour contenir la grid et le contenu
+        var horizontalLayout = new HorizontalLayout();
+        horizontalLayout.setSizeFull();
         
+        // Ajuster la taille de la grid
+        grid.setHeight("100%");
+        grid.setWidth("50%");
+        
+        // Ajuster le contentDiv
+        contentDiv.setHeight("100%");
+        contentDiv.setWidth("50%");
+        
+        // Ajouter les composants au layout horizontal
+        horizontalLayout.add(grid, contentDiv);
+        
+        // Remplacer les add() individuels par l'ajout du layout horizontal
+        add(horizontalLayout);
+        
+        // Ajouter le prompt en bas
         var promptContainer = new VerticalLayout(prompt);
         promptContainer.setWidth("100%");
         promptContainer.setPadding(false);
         promptContainer.setSpacing(false);
         promptContainer.setMargin(false);
-        
         add(promptContainer);
         
-        setFlexGrow(1, grid);
-        setFlexGrow(0, contentDiv);
+        // Ajuster les flex grow
+        setFlexGrow(1, horizontalLayout);
         setFlexGrow(0, promptContainer);
     }
 
@@ -160,8 +174,7 @@ public class MainView extends VerticalLayout {
 
     private void addRepliesColumn(Grid<MastodonPost> grid) {
         grid.addColumn(post -> post.getRepliesCount())
-                .setWidth("7em")
-                .setFlexGrow(0);
+                .setAutoWidth(true);
     }
 
     private void addContentColumn(Grid<MastodonPost> grid) {
@@ -196,7 +209,7 @@ public class MainView extends VerticalLayout {
         try {
             
             var uri = new URIBuilder("https://mastodon.social/api/v1/timelines/tag/" + tag)
-                    .addParameter("limit", "10")
+                    .addParameter("limit", "100")
                     .build();
 
             URL url = uri.toURL();
@@ -225,7 +238,85 @@ public class MainView extends VerticalLayout {
         closeAll(grid);
         // Met à jour le contenu HTML et expande la ligne sélectionnée
         event.getFirstSelectedItem().ifPresent(post -> {
-            contentDiv.getElement().setProperty("innerHTML", post.getContent());
+            // Créer un conteneur vertical pour le contenu et les réponses
+            VerticalLayout container = new VerticalLayout();
+            
+            // Ajouter le contenu du post
+            Div postContent = new Div();
+            postContent.getElement().setProperty("innerHTML", post.getContent());
+            container.add(postContent);
+            
+            // Ajouter les réponses si elles existent
+            if (post.getRepliesCount() > 0) {
+                Div repliesHeader = new Div();
+                repliesHeader.setText("Réponses (" + post.getRepliesCount() + ")");
+                // Récupérer les réponses via l'API
+                try {
+                    var uri = new URIBuilder("https://mastodon.social/api/v1/statuses/" + post.getId() + "/context")
+                            .build();
+
+                    // Afficher l'URI pour pouvoir cliquer dessus
+                    Div uriDiv = new Div();
+                    uriDiv.setText(uri.toString());
+                    uriDiv.getStyle().set("color", "var(--lumo-primary-color)");
+                    uriDiv.getStyle().set("cursor", "pointer");
+                    container.add(uriDiv);
+                    // Afficher le lien du post
+                    Div postLinkDiv = new Div();
+                    String postUrl = "https://mastodon.social/@" + post.getAccount().getUsername() + "/" + post.getId();
+                    postLinkDiv.setText(postUrl);
+                    postLinkDiv.getStyle().set("color", "var(--lumo-primary-color)");
+                    postLinkDiv.getStyle().set("cursor", "pointer");
+                    postLinkDiv.getStyle().set("margin-bottom", "1em");
+                    container.add(postLinkDiv);
+
+                    URL url = uri.toURL();
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("GET");
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    reader.close();
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.registerModule(new JavaTimeModule());
+                    var context = mapper.readTree(response.toString());
+                    var descendants = context.get("descendants");
+
+                    // Créer un conteneur pour les réponses
+                    VerticalLayout repliesContainer = new VerticalLayout();
+                    repliesContainer.setSpacing(true);
+                    repliesContainer.setPadding(true);
+                    repliesContainer.getStyle().set("background", "var(--lumo-contrast-5pct)");
+                    repliesContainer.getStyle().set("border-radius", "var(--lumo-border-radius-m)");
+
+                    // Ajouter chaque réponse
+                    for (var reply : descendants) {
+                        Div replyDiv = new Div();
+                        replyDiv.getElement().setProperty("innerHTML", reply.get("content").asText());
+                        replyDiv.getStyle().set("margin-bottom", "0.5em");
+                        repliesContainer.add(replyDiv);
+                    }
+                    
+                    container.add(repliesContainer);
+                } catch (IOException | URISyntaxException e) {
+                    Div errorDiv = new Div();
+                    errorDiv.setText("Erreur lors de la récupération des réponses: " + e.getMessage());
+                    errorDiv.getStyle().set("color", "var(--lumo-error-text-color)");
+                    container.add(errorDiv);
+                }
+                repliesHeader.getStyle().set("margin-top", "1em");
+                repliesHeader.getStyle().set("font-weight", "bold");
+                container.add(repliesHeader);
+            }
+            
+            // Remplacer le contenu du contentDiv
+            contentDiv.removeAll();
+            contentDiv.add(container);
+            
             grid.setDetailsVisible(post, true);
         });
     }
