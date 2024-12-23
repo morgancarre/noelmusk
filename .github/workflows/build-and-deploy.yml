@@ -42,6 +42,10 @@ jobs:
         name: my-app-jar
         path: target/*.jar
 
+    # Verify the contents of the target directory
+    - name: List target directory
+      run: ls -la target/
+
     # Deploy the JAR to the remote server via SSH
     - name: Deploy JAR to remote server
       uses: appleboy/ssh-action@v0.1.6
