@@ -35,6 +35,13 @@ jobs:
     - name: Build JAR with Maven
       run: mvn clean package -Pproduction -Dvaadin.force.production.build=true -DskipTests
 
+    # Upload the JAR as an artifact (optional)
+    - name: Upload JAR as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: my-app-jar
+        path: target/*.jar
+
     # Deploy the JAR to the remote server via SSH
     - name: Deploy JAR to remote server
       uses: appleboy/ssh-action@v0.1.6
@@ -44,9 +51,6 @@ jobs:
         key: ${{ secrets.REMOTE_SSH_KEY }}
         port: 22
         script: |
-          ls -al target/
-          ls -al
-          pwd
-          ls -la /home/runner/work/noelmusk/noelmusk/target/
-          scp target/antix-1.0-SNAPSHOT.jar ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
+          ls -la
+          scp target/*.jar ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
 
