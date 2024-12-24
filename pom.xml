@@ -170,7 +170,7 @@
             </properties>
             <dependencies>
                 <!-- Exclude development dependencies from production -->
-                <!-- <dependency>
+                <dependency>
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-core</artifactId>
                     <exclusions>
@@ -179,7 +179,7 @@
                             <artifactId>vaadin-dev</artifactId>
                         </exclusion>
                     </exclusions>
-                </dependency> -->
+                </dependency>
             </dependencies>
             <build>
                 <plugins>
@@ -195,11 +195,6 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <!-- To always force an optimized production bundle build set this configuration to 'true' -->
-                            <!-- To possibly use the pre-compiled production bundle remove or set to 'false' -->
-                            <forceProductionBuild>true</forceProductionBuild>
-                            <!-- To have reproducible build by running 'npm ci' -->
-                            <ciBuild>true</ciBuild>
                             <frontendHotdeploy>false</frontendHotdeploy>
                         </configuration>
                     </plugin>
