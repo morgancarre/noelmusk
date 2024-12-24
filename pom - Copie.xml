@@ -13,7 +13,7 @@
     <properties>
         <java.version>21</java.version>
         <vaadin.version>24.5.7</vaadin.version>
-        <vaadin.production.mode>false</vaadin.production.mode>
+        <vaadin.productionMode>false</vaadin.productionMode>
         <vaadin.frontend.hotdeploy>true</vaadin.frontend.hotdeploy>
     </properties>
 
@@ -126,12 +126,6 @@
     </dependencies>
 
     <build>
-          <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-        </resource>
-    </resources>
         <defaultGoal>spring-boot:run</defaultGoal>
         <plugins>
             <plugin>
@@ -171,6 +165,7 @@
             <!-- Production mode is activated using -Pproduction -->
             <id>production</id>
             <properties>
+                <toto>coucou</toto>
                 <vaadin.production.mode>true</vaadin.production.mode>
                 <vaadin.frontend.hotdeploy>false</vaadin.frontend.hotdeploy>
             </properties>
@@ -188,12 +183,12 @@
                 </dependency>
             </dependencies>
             <build>       
-                      <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-        </resource>
-    </resources>
+                 <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
                 <plugins>
                     <plugin>
                         <groupId>com.vaadin</groupId>

@@ -14,5 +14,7 @@ vaadin:
     - com.vaadin
     - org.vaadin
     - com
-  productionMode: true
-  frontend.hotdeploy: false
+  productionMode: @vaadin.production.mode@
+  frontend:
+    hotdeploy: @vaadin.frontend.hotdeploy@
+
