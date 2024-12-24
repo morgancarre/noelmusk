@@ -170,7 +170,7 @@
             </properties>
             <dependencies>
                 <!-- Exclude development dependencies from production -->
-                <dependency>
+                <!-- <dependency>
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-core</artifactId>
                     <exclusions>
@@ -179,7 +179,7 @@
                             <artifactId>vaadin-dev</artifactId>
                         </exclusion>
                     </exclusions>
-                </dependency>
+                </dependency> -->
             </dependencies>
             <build>
                 <plugins>
