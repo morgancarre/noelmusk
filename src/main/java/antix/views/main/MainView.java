@@ -215,6 +215,7 @@ public class MainView extends VerticalLayout {
             URL url = uri.toURL();
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
+            
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuilder response = new StringBuilder();
             String line;

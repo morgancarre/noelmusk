@@ -3,7 +3,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <!-- Project from https://start.vaadin.com/project/a6aedc7d-0591-4fc8-8eba-19d863409ce2 -->
     <groupId>com</groupId>
     <artifactId>antix</artifactId>
     <name>antix</name>
@@ -13,8 +12,6 @@
     <properties>
         <java.version>21</java.version>
         <vaadin.version>24.5.7</vaadin.version>
-        <vaadin.production.mode>false</vaadin.production.mode>
-        <vaadin.frontend.hotdeploy>true</vaadin.frontend.hotdeploy>
     </properties>
 
     <parent>
@@ -126,12 +123,6 @@
     </dependencies>
 
     <build>
-          <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-        </resource>
-    </resources>
         <defaultGoal>spring-boot:run</defaultGoal>
         <plugins>
             <plugin>
@@ -167,6 +158,21 @@
     </build>
 
     <profiles>
+    <profile>
+        <id>dev</id>
+        <properties>
+            <vaadin.production.mode>false</vaadin.production.mode>
+            <vaadin.frontend.hotdeploy>true</vaadin.frontend.hotdeploy>
+        </properties>
+             <build>       
+                      <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+        </resource>
+    </resources>
+    </build>
+    </profile>
         <profile>
             <!-- Production mode is activated using -Pproduction -->
             <id>production</id>
@@ -208,52 +214,6 @@
                         </executions>
                         <configuration>
                             <frontendHotdeploy>false</frontendHotdeploy>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>it</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>start-spring-boot</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>start</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>stop-spring-boot</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- Runs the integration tests (*IT) after the server is started -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <trimStackTrace>false</trimStackTrace>
-                            <enableAssertions>true</enableAssertions>
                         </configuration>
                     </plugin>
                 </plugins>
