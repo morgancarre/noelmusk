@@ -203,6 +203,9 @@
             <directory>src/main/resources</directory>
             <filtering>true</filtering>
         </resource>
+                 <excludes>
+        <exclude>*.p12</exclude>
+      </excludes>
     </resources>
                 <plugins>
                     <plugin>
