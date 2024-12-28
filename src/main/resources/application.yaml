@@ -1,12 +1,15 @@
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:certificat.p12
+    key-store-password: ${KEY_STORE_PASSWORD}
+    key-store-type: PKCS12
+    key-alias: tweetx.info
+
 logging:
   level:
     org.atmosphere: warn
-
-spring:
-  mustache:
-    check-template-location: false
-  jpa:
-    defer-datasource-initialization: true
 
 vaadin:
   launch-browser: true
@@ -17,4 +20,3 @@ vaadin:
   productionMode: @vaadin.production.mode@
   frontend:
     hotdeploy: @vaadin.frontend.hotdeploy@
-
