@@ -9,8 +9,6 @@ types.d.ts
 vite.config.ts
 vite.generated.ts
 
-.certif_tweetx/
-
 # Log file
 *.log
 
