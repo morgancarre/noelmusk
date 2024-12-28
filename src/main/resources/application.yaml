@@ -9,7 +9,7 @@ server:
 
 logging:
   level:
-    org.atmosphere: warn
+    root: warn
 
 vaadin:
   launch-browser: true
