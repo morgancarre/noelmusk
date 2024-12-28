@@ -1,11 +1,5 @@
 server:
-  port: 8443
-  ssl:
-    enabled: true
-    key-store: classpath:certificat.p12
-    key-store-password: ${KEY_STORE_PASSWORD}
-    key-store-type: PKCS12
-    key-alias: tweetx.info
+  port: 8081
 
 logging:
   level:
