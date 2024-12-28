@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com</groupId>
     <artifactId>antix</artifactId>
@@ -49,34 +49,27 @@
             <artifactId>jsoup</artifactId>
             <version>1.15.4</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.14</version>
         </dependency>
-
         <dependency>
             <groupId>jakarta.json.bind</groupId>
             <artifactId>jakarta.json.bind-api</artifactId>
             <version>3.0.1</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.36</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.18.2</version>
         </dependency>
-
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-core</artifactId>
@@ -90,18 +83,15 @@
             <artifactId>line-awesome</artifactId>
             <version>2.1.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
@@ -159,33 +149,32 @@
     </build>
 
     <profiles>
-    <profile>
-        <id>dev</id>
-        <properties>
-            <vaadin.production.mode>false</vaadin.production.mode>
-            <vaadin.frontend.hotdeploy>true</vaadin.frontend.hotdeploy>
-        </properties>
-             <build>       
-                      <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-                  <excludes>
-        <exclude>*.p12</exclude>
-      </excludes>
-        </resource>
-    </resources>
-    </build>
-    </profile>
         <profile>
-            <!-- Production mode is activated using -Pproduction -->
+            <id>dev</id>
+            <properties>
+                <vaadin.production.mode>false</vaadin.production.mode>
+                <vaadin.frontend.hotdeploy>true</vaadin.frontend.hotdeploy>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                        <includes>
+                            <include>**/*.yml</include>
+                            <include>**/*.yaml</include>
+                        </includes>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+        <profile>
             <id>production</id>
             <properties>
                 <vaadin.production.mode>true</vaadin.production.mode>
                 <vaadin.frontend.hotdeploy>false</vaadin.frontend.hotdeploy>
             </properties>
             <dependencies>
-                <!-- Exclude development dependencies from production -->
                 <dependency>
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-core</artifactId>
@@ -197,16 +186,17 @@
                     </exclusions>
                 </dependency>
             </dependencies>
-            <build>       
-                      <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-        </resource>
-                 <excludes>
-        <exclude>*.p12</exclude>
-      </excludes>
-    </resources>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                         <includes>
+                            <include>**/*.yml</include>
+                            <include>**/*.yaml</include>
+                        </includes>
+                    </resource>
+                </resources>
                 <plugins>
                     <plugin>
                         <groupId>com.vaadin</groupId>
@@ -226,6 +216,5 @@
                 </plugins>
             </build>
         </profile>
-
     </profiles>
 </project>
