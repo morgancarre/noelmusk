@@ -170,6 +170,9 @@
         <resource>
             <directory>src/main/resources</directory>
             <filtering>true</filtering>
+                  <excludes>
+        <exclude>*.p12</exclude>
+      </excludes>
         </resource>
     </resources>
     </build>
