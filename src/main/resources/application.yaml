@@ -3,7 +3,7 @@ server:
 
 logging:
   level:
-    root: warn
+    root: info
 
 vaadin:
   launch-browser: @vaadin.frontend.hotdeploy@
