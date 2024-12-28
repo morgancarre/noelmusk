@@ -6,7 +6,7 @@ logging:
     root: warn
 
 vaadin:
-  launch-browser: true
+  launch-browser: @vaadin.frontend.hotdeploy@
   allowed-packages: 
     - com.vaadin
     - org.vaadin
