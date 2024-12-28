@@ -29,9 +29,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
+    # Inject the keystore password environment variable
+    - name: Set KEY_STORE_PASSWORD environment variable
+      run: echo "KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}" >> $GITHUB_ENV
+
     # Build the JAR using Maven
     - name: Build JAR with Maven
-      run: mvn clean package -Pproduction -Dvaadin.force.production.build=true -DskipTests -DfinalName=tweetx -DfinalName=tweetx.jar
+      run: mvn clean package -Pproduction -DskipTests
     
     - name: Check for JAR file
       run: |
@@ -52,4 +56,3 @@ jobs:
         key: ${{ secrets.REMOTE_SSH_KEY }}
         source: "./target"
         target: "/opt/tweetx/"
-     
