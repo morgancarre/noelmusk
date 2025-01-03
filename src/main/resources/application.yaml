@@ -1,5 +1,7 @@
 server:
   port: 8081
+  address: tweetx.info
+
 
 logging:
   level:
