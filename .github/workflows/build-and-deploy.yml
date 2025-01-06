@@ -65,4 +65,7 @@ jobs:
 
     # Verify that the JAR file has been transferred correctly
     - name: Verify JAR on remote server
-      run: ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "ls -lh /opt/tweetx/antix-2025.jar"
+      run: |
+        echo "${{ secrets.REMOTE_SSH_KEY }}" > ssh_key
+        chmod 600 ssh_key  
+        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "ls -lh /opt/tweetx/antix-2025.jar"
