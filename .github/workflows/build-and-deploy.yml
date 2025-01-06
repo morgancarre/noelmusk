@@ -53,13 +53,16 @@ jobs:
         echo "${{ secrets.REMOTE_SSH_KEY }}" > ssh_key
         chmod 600 ssh_key
         ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "sudo rm -rf /opt/tweetx/*"
+        rm -f ssh_key  # Clean up the private key after use
 
-    # Deploy the JAR to the remote server via SSH
+    # Deploy the JAR to the remote server via SCP
     - name: Deploy JAR to remote server
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.REMOTE_HOST }}
-        username: ${{ secrets.REMOTE_USER }}
-        key: ${{ secrets.REMOTE_SSH_KEY }}
-        source: "./target/antix-2025.jar"
-        target: "/opt/tweetx/antix-2025.jar"
+      run: |
+        echo "${{ secrets.REMOTE_SSH_KEY }}" > ssh_key
+        chmod 600 ssh_key
+        scp -i ssh_key -o StrictHostKeyChecking=no ./target/antix-2025.jar root@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
+        rm -f ssh_key  # Clean up the private key after use
+
+    # Verify that the JAR file has been transferred correctly
+    - name: Verify JAR on remote server
+      run: ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "ls -lh /opt/tweetx/antix-2025.jar"
