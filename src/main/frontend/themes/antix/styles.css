@@ -7,7 +7,13 @@
   --lumo-font-size-xl: 1.375rem;
 }
 
-/* Ajuster la taille de police pour le corps du document */
-html {
-  font-size: 14px; /* Taille de base plus petite */
+:root {
+  --lumo-base-color: red;
+  --lumo-primary-color: red;
+  --lumo-secondary-color: red;
+  --lumo-tertiary-color: red;
+  --lumo-error-color: red;
+  --lumo-success-color: red;
+  --lumo-warning-color: red;
 }
+
