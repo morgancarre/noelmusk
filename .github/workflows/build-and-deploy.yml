@@ -56,3 +56,4 @@ jobs:
         key: ${{ secrets.REMOTE_SSH_KEY }}
         source: "./target/antix-2025.jar"
         target: "/opt/tweetx/"
+        strip_components: 1
