@@ -49,7 +49,10 @@ jobs:
 
     # Remove existing files in the target directory on the remote server
     - name: Remove existing files in /opt/tweetx
-      run: ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "sudo rm -rf /opt/tweetx/*"
+      run: |
+        echo "${{ secrets.REMOTE_SSH_KEY }}" > ssh_key
+        chmod 600 ssh_key
+        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "sudo rm -rf /opt/tweetx/*"
 
     # Deploy the JAR to the remote server via SSH
     - name: Deploy JAR to remote server
