@@ -7,13 +7,28 @@
   --lumo-font-size-xl: 1.375rem;
 }
 
-:root {
-  --lumo-base-color: red;
-  --lumo-primary-color: red;
-  --lumo-secondary-color: red;
-  --lumo-tertiary-color: red;
-  --lumo-error-color: red;
-  --lumo-success-color: red;
-  --lumo-warning-color: red;
+/* Ajout de styles pour les tableaux */
+table {
+  border-collapse: collapse; /* Pour un aspect compact */
+  width: 100%; /* Prendre toute la largeur disponible */
+  font-family: monospace; /* Utiliser une police monospace */
+  background-color: #1e1e1e; /* Couleur de fond sombre */
+  color: #ffffff; /* Couleur du texte */
 }
+
+th, td {
+  border: 1px solid #444; /* Bordure sombre */
+  padding: 8px; /* Espacement interne */
+  text-align: left; /* Alignement à gauche */
+}
+
+th {
+  background-color: #333; /* Couleur de fond pour les en-têtes */
+}
+
+tr:nth-child(even) {
+  background-color: #2a2a2a; /* Couleur de fond pour les lignes paires */
+}
+
+
 
