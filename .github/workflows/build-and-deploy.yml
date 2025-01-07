@@ -14,58 +14,31 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-
-    # Cache dependencies to speed up the build process
-    - name: Cache Maven dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
-
-    # Inject the keystore password environment variable
     - name: Set KEY_STORE_PASSWORD environment variable
       run: echo "KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}" >> $GITHUB_ENV
 
-    # Build the JAR using Maven
-    - name: Build JAR with Maven
-      run: mvn clean package -Pproduction -DskipTests
-    
-    - name: Check for JAR file
+    - name: Set up SSH key
       run: |
-        ls ./target/
-        if ls ./target/*.jar 1> /dev/null 2>&1; then
-          echo "JAR file exists.";
-        else
-          echo "JAR file not found. Exiting.";
-          exit 1;
-        fi
+        echo "${{ secrets.REMOTE_SSH_KEY }}" > ssh_key
+        chmod 600 ssh_key
 
-    # Remove existing files in the target directory on the remote server
+    - name: Stop the antix-app service
+      run: |
+        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "sudo systemctl stop antix-app.service"
+    
     - name: Remove existing files in /opt/tweetx
       run: |
-        echo "${{ secrets.REMOTE_SSH_KEY }}" > ssh_key
-        chmod 600 ssh_key
         ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "sudo rm -rf /opt/tweetx/*"
-        rm -f ssh_key  # Clean up the private key after use
 
-    # Deploy the JAR to the remote server via SCP
     - name: Deploy JAR to remote server
       run: |
-        echo "${{ secrets.REMOTE_SSH_KEY }}" > ssh_key
-        chmod 600 ssh_key
         scp -i ssh_key -o StrictHostKeyChecking=no ./target/antix-2025.jar root@${{ secrets.REMOTE_HOST }}:/opt/tweetx/
-        rm -f ssh_key  # Clean up the private key after use
 
-    # Verify that the JAR file has been transferred correctly
     - name: Verify JAR on remote server
       run: |
-        echo "${{ secrets.REMOTE_SSH_KEY }}" > ssh_key
-        chmod 600 ssh_key  
         ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "ls -lh /opt/tweetx/antix-2025.jar"
+    
+    - name: Start the antix-app service
+      run: |
+        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "sudo systemctl start antix-app.service"
+
