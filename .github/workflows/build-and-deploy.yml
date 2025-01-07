@@ -1,6 +1,5 @@
 name: Build and Deploy JAR
 
-# Trigger the workflow when code is pushed to the main branch
 on:
   push:
     branches:
@@ -13,10 +12,19 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
 
     - name: Set KEY_STORE_PASSWORD environment variable
       run: echo "KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}" >> $GITHUB_ENV
 
+    - name: Build JAR with Maven
+      run: mvn clean package -Pproduction -DskipTests
+ 
     - name: Set up SSH key
       run: |
         echo "${{ secrets.REMOTE_SSH_KEY }}" > ssh_key
