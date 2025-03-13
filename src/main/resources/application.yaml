@@ -1,9 +1,3 @@
-server:
-  port: 8081
-  forward-headers-strategy: framework
-  use-forward-headers: true
-
-
 logging:
   level:
     root: info
