@@ -39,9 +39,12 @@ jobs:
           TEAM_NUMBER=${BASH_REMATCH[1]}
           DEPLOY_PATH="/opt/equipe$TEAM_NUMBER"
           PORT=$((8000 + TEAM_NUMBER))
-        else
+        elif [[ "$BRANCH_NAME" == "main" ]]; then
           DEPLOY_PATH="/opt/tweetx"
           PORT=8080
+        else
+          echo "Branch not supported for deployment"
+          exit 1
         fi
         echo "DEPLOY_PATH=$DEPLOY_PATH" >> $GITHUB_ENV
         echo "PORT=$PORT" >> $GITHUB_ENV
@@ -49,38 +52,22 @@ jobs:
 
     - name: Stop the existing service
       run: |
-        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "sudo systemctl stop antix-app-$PORT.service || true"
-
-    - name: Remove existing files in target directory
-      run: |
-        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "sudo rm -rf $DEPLOY_PATH/*"
+        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "
+          sudo systemctl stop antix-app-$PORT.service || true
+        "
 
     - name: Deploy JAR to remote server
       run: |
-        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "sudo mkdir -p $DEPLOY_PATH"
         scp -i ssh_key -o StrictHostKeyChecking=no ./target/antix-2025.jar root@${{ secrets.REMOTE_HOST }}:$DEPLOY_PATH/
 
     - name: Verify JAR on remote server
       run: |
-        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "ls -lh $DEPLOY_PATH/antix-2025.jar"
+        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "
+          ls -lh $DEPLOY_PATH/antix-2025.jar
+        "
 
-    - name: Create or Update Service File
+    - name: Start the existing service
       run: |
-        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} << EOF
-          echo "[Unit]
-          Description=Antix App - Team $PORT
-          After=network.target
-          
-          [Service]
-          User=root
-          WorkingDirectory=$DEPLOY_PATH
-          ExecStart=/usr/bin/java -jar $DEPLOY_PATH/antix-2025.jar --server.port=$PORT
-          Restart=always
-          
-          [Install]
-          WantedBy=multi-user.target" | sudo tee /etc/systemd/system/antix-app-$PORT.service
-        EOF
-
-    - name: Reload Systemd and Start Service
-      run: |
-        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "sudo systemctl daemon-reload && sudo systemctl start antix-app-$PORT.service"
+        ssh -i ssh_key -o StrictHostKeyChecking=no root@${{ secrets.REMOTE_HOST }} "
+          sudo systemctl start antix-app-$PORT.service
+        "
