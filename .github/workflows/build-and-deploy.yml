@@ -1,4 +1,4 @@
-name: Build and Deploy JARs
+name: Build and Deploy JAR
 
 on:
   push:
