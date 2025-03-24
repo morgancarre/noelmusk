@@ -16,6 +16,7 @@ If you install the Vaadin plugin for IntelliJ, you should instead launch the `Ap
 
 The project is a standard Maven project. To create a production build, call 
 
+
 ```
 ./mvnw clean package -Pproduction
 ```
