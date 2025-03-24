@@ -9,11 +9,11 @@ logging:
     root: info
 
 vaadin:
-  launch-browser: @vaadin.frontend.hotdeploy@
+  launch-browser: true
   allowed-packages: 
     - com.vaadin
     - org.vaadin
     - com
-  productionMode: @vaadin.production.mode@
+  productionMode: false
   frontend:
-    hotdeploy: @vaadin.frontend.hotdeploy@
+    hotdeploy: true
