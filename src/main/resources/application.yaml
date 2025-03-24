@@ -1,19 +1,13 @@
-server:
-  port: 8081
-  forward-headers-strategy: framework
-  use-forward-headers: true
-
-
 logging:
   level:
     root: info
 
 vaadin:
-  launch-browser: true
+  launch-browser: @vaadin.frontend.hotdeploy@
   allowed-packages: 
     - com.vaadin
     - org.vaadin
     - com
-  productionMode: false
+  productionMode: @vaadin.production.mode@
   frontend:
-    hotdeploy: true
+    hotdeploy: @vaadin.frontend.hotdeploy@

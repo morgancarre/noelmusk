@@ -8,7 +8,7 @@
 }
 /* Définir la couleur de fond rouge pour les composants Vaadin */
 [theme~="dark"] {
-  /* --lumo-base-color: white;  */
+   --lumo-base-color: white;  
 }
 
 /* Ajout de styles pour les tableaux */
