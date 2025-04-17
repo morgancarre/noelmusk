@@ -46,16 +46,16 @@ public class MainView extends VerticalLayout {
         setAlignItems(FlexComponent.Alignment.CENTER);
         var grid = new Grid<>(MastodonPost.class, false);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        
+
         // Créer le composant HTML pour afficher le contenu
         var contentDiv = new Div();
         contentDiv.setWidthFull();
 
-        //addLineNumberColumn(grid);
-       // addTagsColumn(grid);
+        // addLineNumberColumn(grid);
+        // addTagsColumn(grid);
         addRepliesColumn(grid);
         addContentColumn(grid);
-        
+
         grid.setItemDetailsRenderer(new ComponentRenderer<>(post -> new Div(Jsoup.parse(post.getContent()).text())));
         grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
         grid.setDetailsVisibleOnClick(false);
@@ -69,14 +69,14 @@ public class MainView extends VerticalLayout {
             }
             String text = v.getValue().trim();
             // if (text.startsWith("goto ")) {
-            //     closeAll(grid);
-            //     String id = text.substring(3).trim();
-            //     if (!id.isEmpty()) {
-            //         var post = findPostById(grid, Integer.parseInt(id));
-            //         grid.setDetailsVisible(post, true);
-            //     }
+            // closeAll(grid);
+            // String id = text.substring(3).trim();
+            // if (!id.isEmpty()) {
+            // var post = findPostById(grid, Integer.parseInt(id));
+            // grid.setDetailsVisible(post, true);
+            // }
             // } else
-             if (text.startsWith("hashtag ") || text.startsWith("h ")) {
+            if (text.startsWith("hashtag ") || text.startsWith("h ")) {
                 String tag = text.substring(1).trim();
                 grid.setItems(fetchPostsFromTag(tag));
                 grid.getDataProvider().fetch(new Query<>()).findFirst().ifPresent(firstItem -> {
@@ -93,6 +93,15 @@ public class MainView extends VerticalLayout {
                     }
                 } else if (!items.isEmpty()) {
                     grid.select(items.get(0));
+                }
+            } else if (text.startsWith("goto ") || text.startsWith("g ")) {
+                try {
+                    int index = Integer.parseInt(text.substring(5).trim()) - 1;
+                    List<MastodonPost> items = grid.getDataProvider().fetch(new Query<>()).collect(Collectors.toList());
+                    if (index >= 0 && index < items.size()) {
+                        grid.select(items.get(index));
+                    }
+                } catch (NumberFormatException ignored) {
                 }
             } else if (text.equals("previous") || text.equals("p")) {
                 // Sélectionne la ligne précédente
@@ -113,21 +122,21 @@ public class MainView extends VerticalLayout {
         // Créer un HorizontalLayout pour contenir la grid et le contenu
         var horizontalLayout = new HorizontalLayout();
         horizontalLayout.setSizeFull();
-        
+
         // Ajuster la taille de la grid
         grid.setHeight("100%");
         grid.setWidth("50%");
-        
+
         // Ajuster le contentDiv
         contentDiv.setHeight("100%");
         contentDiv.setWidth("50%");
-        
+
         // Ajouter les composants au layout horizontal
         horizontalLayout.add(grid, contentDiv);
-        
+
         // Remplacer les add() individuels par l'ajout du layout horizontal
         add(horizontalLayout);
-        
+
         // Ajouter le prompt en bas
         var promptContainer = new VerticalLayout(prompt);
         promptContainer.setWidth("100%");
@@ -135,7 +144,7 @@ public class MainView extends VerticalLayout {
         promptContainer.setSpacing(false);
         promptContainer.setMargin(false);
         add(promptContainer);
-        
+
         // Ajuster les flex grow
         setFlexGrow(1, horizontalLayout);
         setFlexGrow(0, promptContainer);
@@ -152,11 +161,11 @@ public class MainView extends VerticalLayout {
             var tagContainer = new FlexLayout();
             tagContainer.setFlexWrap(FlexLayout.FlexWrap.WRAP);
             tagContainer.setAlignItems(FlexComponent.Alignment.CENTER);
-            
+
             if (post.getTags() != null) {
                 var tags = post.getTags();
                 var displayCount = Math.min(3, tags.size());
-                
+
                 // Affiche les 3 premiers tags
                 for (int i = 0; i < displayCount; i++) {
                     var badge = new Span(tags.get(i).getName());
@@ -164,7 +173,7 @@ public class MainView extends VerticalLayout {
                     badge.getStyle().set("margin", "2px");
                     tagContainer.add(badge);
                 }
-                
+
                 // Affiche le badge +X si il y a plus de 3 tags
                 if (tags.size() > 3) {
                     var remainingCount = tags.size() - 3;
@@ -211,9 +220,10 @@ public class MainView extends VerticalLayout {
     }
 
     public List<MastodonPost> fetchPostsFromTag(String tag) {
-        if (StringUtils.isEmpty(tag)) return List.of();
+        if (StringUtils.isEmpty(tag))
+            return List.of();
         try {
-            
+
             var uri = new URIBuilder("https://mastodon.social/api/v1/timelines/tag/" + tag)
                     .addParameter("limit", "10")
                     .build();
@@ -221,7 +231,7 @@ public class MainView extends VerticalLayout {
             URL url = uri.toURL();
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuilder response = new StringBuilder();
             String line;
@@ -247,12 +257,12 @@ public class MainView extends VerticalLayout {
         event.getFirstSelectedItem().ifPresent(post -> {
             // Créer un conteneur vertical pour le contenu et les réponses
             VerticalLayout container = new VerticalLayout();
-            
+
             // Ajouter le contenu du post
             Div postContent = new Div();
             postContent.getElement().setProperty("innerHTML", post.getContent());
             container.add(postContent);
-            
+
             // Ajouter les réponses si elles existent
             if (post.getRepliesCount() > 0) {
                 Div repliesHeader = new Div();
@@ -307,7 +317,7 @@ public class MainView extends VerticalLayout {
                         replyDiv.getStyle().set("margin-bottom", "0.5em");
                         repliesContainer.add(replyDiv);
                     }
-                    
+
                     container.add(repliesContainer);
                 } catch (IOException | URISyntaxException e) {
                     Div errorDiv = new Div();
@@ -319,11 +329,11 @@ public class MainView extends VerticalLayout {
                 repliesHeader.getStyle().set("font-weight", "bold");
                 container.add(repliesHeader);
             }
-            
+
             // Remplacer le contenu du contentDiv
             contentDiv.removeAll();
             contentDiv.add(container);
-            
+
             grid.setDetailsVisible(post, true);
         });
     }
