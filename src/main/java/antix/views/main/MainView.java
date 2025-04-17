@@ -32,10 +32,16 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.UI;
+
 @PageTitle("main")
 @Route("")
 public class MainView extends VerticalLayout {
     public MainView() {
+
+        // Désactiver la souris (curseur)
+        UI.getCurrent().getPage().executeJs("document.body.style.cursor = 'none';");
+
         setSizeFull();
         setAlignItems(FlexComponent.Alignment.CENTER);
         var grid = new Grid<>(MastodonPost.class, false);
