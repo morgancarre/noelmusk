@@ -26,6 +26,10 @@ public class LinkCommand implements Command {
             linkField.setReadOnly(true);
             linkField.setWidthFull();
             linkField.focus(); // focus clavier direct
+            linkField.getElement().executeJs( // copie auto
+                "navigator.clipboard.writeText($0)",
+                url
+            );
 
             contentDiv.add(linkField);
         } else {
@@ -35,6 +39,6 @@ public class LinkCommand implements Command {
 
     @Override
     public String getDescription() {
-        return "l / link : afficher le lien du post sélectionné dans un champ copiable";
+        return "l / link : copier le lien du post sélectionné dans le presse-papier";
     }
 }
