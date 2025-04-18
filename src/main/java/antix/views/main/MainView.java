@@ -171,6 +171,13 @@ public class MainView extends VerticalLayout {
         grid.addColumn(MastodonPost::getRepliesCount).setAutoWidth(true);
     }
 
+    private void addIndexColumn(Grid<MastodonPost> grid) {
+        grid.addColumn(post -> {
+            List<MastodonPost> items = grid.getListDataView().getItems().toList();
+            return items.indexOf(post) + 1;
+        }).setAutoWidth(true);
+    }
+
     private void addContentColumn(Grid<MastodonPost> grid) {
         grid.addColumn(p -> StringUtils.left(Jsoup.parse(p.getContent()).text(), 150)).setAutoWidth(true);
     }
