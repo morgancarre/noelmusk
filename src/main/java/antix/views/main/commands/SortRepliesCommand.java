@@ -2,7 +2,6 @@ package antix.views.main.commands;
 
 import antix.model.MastodonPost;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.data.provider.Query;
 
 import java.util.List;
@@ -10,11 +9,9 @@ import java.util.stream.Collectors;
 
 public class SortRepliesCommand implements Command {
     private final Grid<MastodonPost> grid;
-    private final Div contentDiv;
 
-    public SortRepliesCommand(Grid<MastodonPost> grid, Div contentDiv) {
+    public SortRepliesCommand(Grid<MastodonPost> grid) {
         this.grid = grid;
-        this.contentDiv = contentDiv;
     }
 
     @Override
@@ -30,8 +27,6 @@ public class SortRepliesCommand implements Command {
         if (!items.isEmpty()) {
             grid.select(items.get(0));
         }
-        contentDiv.removeAll();
-        contentDiv.add(new Div("Tri par nombre de réponses décroissant."));
     }
 
 }

@@ -124,7 +124,6 @@ public class HashtagCommand implements Command {
         } else {
             grid.setItems(finalList);
             grid.select(finalList.get(0));
-            contentDiv.setText("✅ Résultat de la recherche \"" + query + "\" : " + finalList.size() + " post(s)");
         }
     }
 

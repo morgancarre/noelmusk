@@ -6,12 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -30,7 +28,6 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @PageTitle("NeoMusk - Test pour la bande")
 @Route("")
@@ -104,15 +101,15 @@ public class MainView extends VerticalLayout {
         PlayCommand playCmd = new PlayCommand(grid);
         commandMap.put("?", helpCmd);
         commandMap.put("help", helpCmd);
-        commandMap.put("fav", new FavCommand(grid, favoris, contentDiv));
-        commandMap.put("f", new FavCommand(grid, favoris, contentDiv));
-        commandMap.put("sort replies", new SortRepliesCommand(grid, contentDiv));
+        commandMap.put("fav", new FavCommand(grid, favoris));
+        commandMap.put("f", new FavCommand(grid, favoris));
+        commandMap.put("sort replies", new SortRepliesCommand(grid));
         commandMap.put("h", new HashtagCommand(grid, contentDiv, tagFetcher));
         commandMap.put("hashtag", new HashtagCommand(grid, contentDiv, tagFetcher));
         commandMap.put("c", new ContentSearchCommand(grid, contentDiv));
         commandMap.put("rand", new RandCommand(grid));
         commandMap.put("random", new RandCommand(grid));
-        commandMap.put("reset", new ResetCommand(grid, contentDiv, () -> fetchPostsFromTag("info")));
+        commandMap.put("reset", new ResetCommand(grid, () -> fetchPostsFromTag("info")));
         commandMap.put("top", new TopCommand(grid));
         commandMap.put("bottom", new BottomCommand(grid));
         commandMap.put("select", new SelectByIdCommand(grid));
