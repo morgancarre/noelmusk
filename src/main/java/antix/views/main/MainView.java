@@ -134,7 +134,7 @@ public class MainView extends VerticalLayout {
             if (text.isEmpty())
                 return;
 
-            PlayCommand.stop();
+            playCmd.stop();
 
             if (commandMap.containsKey(text.split(" ")[0])) {
                 commandMap.get(text.split(" ")[0]).execute(text);

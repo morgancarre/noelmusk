@@ -66,7 +66,7 @@ public class PlayCommand implements Command {
         return "play <n> : change de post automatiquement toutes les n secondes (rotation circulaire)";
     }
 
-    public static void stop() {
+    public void stop() {
         if (timer != null) {
             timer.cancel();
             timer = null;
