@@ -84,7 +84,7 @@ public class MainView extends VerticalLayout {
         var contentDiv = new Div();
         contentDiv.setWidthFull();
 
-        addRepliesColumn(grid);
+        addIndexColumn(grid);
         addContentColumn(grid);
         grid.setItemDetailsRenderer(new ComponentRenderer<>(post -> new Div(Jsoup.parse(post.getContent()).text())));
         grid.setDetailsVisibleOnClick(false);
@@ -164,11 +164,6 @@ public class MainView extends VerticalLayout {
         setFlexGrow(0, promptContainer);
 
         grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
-    }
-
-    // Ajoute les colonnes
-    private void addRepliesColumn(Grid<MastodonPost> grid) {
-        grid.addColumn(MastodonPost::getRepliesCount).setAutoWidth(true);
     }
 
     private void addIndexColumn(Grid<MastodonPost> grid) {
