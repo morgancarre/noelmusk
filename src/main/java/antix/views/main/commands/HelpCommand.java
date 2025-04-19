@@ -1,6 +1,8 @@
 package antix.views.main.commands;
 
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Paragraph;
 
 import java.util.*;
 
@@ -24,17 +26,18 @@ public class HelpCommand implements Command {
         Div helpDiv = new Div();
         helpDiv.getStyle().set("white-space", "pre-wrap");
 
-        StringBuilder helpText = new StringBuilder("Commandes disponibles :\n");
+        helpDiv.add(new H2("Commandes disponibles :"));
 
         Set<String> seenDescriptions = new HashSet<>();
-        new HashSet<>(commandMap.values()).forEach(cmd -> {
+        Set<Command> uniqueCommands = new LinkedHashSet<>(commandMap.values());
+
+        uniqueCommands.forEach(cmd -> {
             String desc = cmd.getDescription();
             if (seenDescriptions.add(desc)) {
-                helpText.append(desc).append("\n");
+                helpDiv.add(new Paragraph(desc));
             }
         });
 
-        helpDiv.setText(helpText.toString().trim());
         contentDiv.add(helpDiv);
     }
 }

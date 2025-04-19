@@ -94,7 +94,7 @@ public class MainView extends VerticalLayout {
         List<MastodonPost> favoris = new ArrayList<>();
 
         // Commandes
-        Map<String, Command> commandMap = new HashMap<>();
+        Map<String, Command> commandMap = new LinkedHashMap<>();
         Function<String, List<MastodonPost>> tagFetcher = this::fetchPostsFromTag;
 
         HelpCommand helpCmd = new HelpCommand(commandMap, contentDiv);
