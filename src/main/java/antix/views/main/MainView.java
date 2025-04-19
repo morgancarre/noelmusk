@@ -182,7 +182,7 @@ public class MainView extends VerticalLayout {
             return List.of();
         try {
             var uri = new URIBuilder("https://mastodon.social/api/v1/timelines/tag/" + tag)
-                    .addParameter("limit", "10")
+                    .addParameter("limit", "40")
                     .build();
 
             URL url = uri.toURL();

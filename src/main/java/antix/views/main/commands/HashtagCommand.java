@@ -116,7 +116,10 @@ public class HashtagCommand implements Command {
             }
         }
 
-        List<MastodonPost> finalList = new ArrayList<>(result);
+        List<MastodonPost> finalList = result.stream()
+            .limit(15)
+            .collect(Collectors.toList());
+
         finalList.sort(Comparator.comparing(MastodonPost::getId).reversed());
 
         if (finalList.isEmpty()) {
