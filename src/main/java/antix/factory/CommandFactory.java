@@ -23,7 +23,6 @@ public class CommandFactory {
      * @param grid         Grille d'affichage des posts.
      * @param contentDiv   Div utilisé pour afficher du contenu (HTML,
      *                     formulaire...).
-     * @param feedbackDiv  Div dédié aux messages utilisateur (feedback).
      * @param selector     Sélecteur de post à afficher.
      * @param favoris      Liste des favoris à mettre à jour.
      * @param resetFetcher Fonction de récupération initiale (ex: tag par défaut).
@@ -33,24 +32,22 @@ public class CommandFactory {
     public static Map<String, Command> build(
             Grid<MastodonPost> grid,
             Div contentDiv,
-            Div feedbackDiv,
             PostSelector selector,
             List<MastodonPost> favoris,
             Supplier<List<MastodonPost>> resetFetcher,
             Function<String, List<MastodonPost>> tagFetcher) {
         Map<String, Command> commands = new LinkedHashMap<>();
 
-        // Commandes avec messages (feedbackDiv)
-        commands.put("reset", new ResetCommand(grid, resetFetcher, selector, feedbackDiv));
-        commands.put("replies", new RepliesGreaterCommand(grid, selector, feedbackDiv));
+        commands.put("reset", new ResetCommand(grid, resetFetcher, selector));
+        commands.put("replies", new RepliesGreaterCommand(grid, selector));
         commands.put("r", commands.get("replies")); // alias
-        commands.put("select", new SelectByIdCommand(grid, selector, feedbackDiv));
-        commands.put("c", new ContentSearchCommand(grid, feedbackDiv, selector));
-        commands.put("h", new HashtagCommand(grid, feedbackDiv, tagFetcher, selector));
+        commands.put("select", new SelectByIdCommand(grid, selector));
+        commands.put("c", new ContentSearchCommand(grid, selector));
+        commands.put("h", new HashtagCommand(grid, tagFetcher, selector));
         commands.put("hashtag", commands.get("h")); // alias
-        commands.put("l", new LinkCommand(grid, contentDiv, feedbackDiv));
+        commands.put("l", new LinkCommand(grid, contentDiv));
         commands.put("link", commands.get("l")); // alias
-        commands.put("f", new FavCommand(grid, favoris, feedbackDiv));
+        commands.put("f", new FavCommand(grid, favoris));
         commands.put("fav", commands.get("f")); // alias
 
         // Commande d'aide
@@ -79,11 +76,11 @@ public class CommandFactory {
         commands.put("stop", stop);
 
         // Commandes spécifiques
-        commands.put("g", new GotoCommand(grid, selector, feedbackDiv));
+        commands.put("g", new GotoCommand(grid, selector));
         commands.put("goto", commands.get("g"));
 
         commands.put("sort replies", new SortRepliesCommand(grid, selector));
-        commands.put("taglist", new TagListCommand(grid, contentDiv)); // pas de message dans feedbackDiv ici
+        commands.put("taglist", new TagListCommand(grid, contentDiv));
 
         return commands;
     }

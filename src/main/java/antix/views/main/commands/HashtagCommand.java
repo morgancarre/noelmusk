@@ -5,7 +5,6 @@ import antix.utils.FeedbackUtils;
 import antix.views.main.PostSelector;
 
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
  */
 public class HashtagCommand implements Command {
     private final Grid<MastodonPost> grid;
-    private final Div feedbackDiv;
     private final Function<String, List<MastodonPost>> tagFetcher;
     private final PostSelector selector;
 
@@ -31,15 +29,13 @@ public class HashtagCommand implements Command {
      * Constructeur.
      *
      * @param grid        Grille contenant les posts.
-     * @param feedbackDiv Zone d'affichage pour les messages utilisateur.
      * @param tagFetcher  Fonction de récupération des posts par tag.
      * @param selector    Sélecteur pour afficher un post.
      */
-    public HashtagCommand(Grid<MastodonPost> grid, Div feedbackDiv,
+    public HashtagCommand(Grid<MastodonPost> grid,
             Function<String, List<MastodonPost>> tagFetcher,
             PostSelector selector) {
         this.grid = grid;
-        this.feedbackDiv = feedbackDiv;
         this.tagFetcher = tagFetcher;
         this.selector = selector;
     }
@@ -51,16 +47,14 @@ public class HashtagCommand implements Command {
      */
     @Override
     public void execute(String input) {
-        feedbackDiv.removeAll();
-
         if (!input.contains(" ")) {
-            FeedbackUtils.showError(feedbackDiv, "Veuillez spécifier un ou plusieurs hashtags après la commande.");
+            FeedbackUtils.showError("Veuillez spécifier un ou plusieurs hashtags après la commande.");
             return;
         }
 
         String query = input.trim().substring(input.indexOf(" ") + 1).trim();
         if (StringUtils.isBlank(query)) {
-            FeedbackUtils.showError(feedbackDiv, "La requête est vide.");
+            FeedbackUtils.showError("La requête est vide.");
             return;
         }
 
@@ -146,11 +140,11 @@ public class HashtagCommand implements Command {
                 .collect(Collectors.toList());
 
         if (finalList.isEmpty()) {
-            FeedbackUtils.showMessage(feedbackDiv, "Aucun post trouvé pour : \"" + query + "\"");
+            FeedbackUtils.showMessage("Aucun post trouvé pour : \"" + query + "\"");
         } else {
             grid.setItems(finalList);
             selector.selectAndDisplay(finalList.get(0));
-            FeedbackUtils.showSuccess(feedbackDiv, finalList.size() + " post(s) trouvés pour : " + query);
+            FeedbackUtils.showSuccess(finalList.size() + " post(s) trouvés pour : " + query);
         }
     }
 

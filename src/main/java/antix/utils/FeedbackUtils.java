@@ -1,53 +1,44 @@
 package antix.utils;
 
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
+import com.vaadin.flow.component.notification.NotificationVariant;
 
 /**
- * Utilitaire pour afficher des messages dans l'interface.
- * Centralise les messages d'erreur, d'information ou de succès dans la zone
- * feedbackDiv.
+ * Utilitaire pour afficher des notifications de feedback dans l'interface.
  */
 public class FeedbackUtils {
 
     /**
-     * Affiche un message dans le feedbackDiv.
+     * Affiche un message.
      *
-     * @param feedbackDiv Zone d'affichage.
      * @param message     Message à afficher.
      */
-    public static void showMessage(Div feedbackDiv, String message) {
-        feedbackDiv.removeAll();
-        Div msg = new Div();
-        msg.setText("ℹ️ " + message);
-        msg.getStyle().set("color", "blue");
-        feedbackDiv.add(msg);
+    public static void showMessage(String message) {
+        Notification notif = Notification.show("ℹ️ " + message);
+        notif.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+        notif.setPosition(Position.TOP_END);
     }
 
     /**
      * Affiche une erreur.
      *
-     * @param feedbackDiv Zone d'affichage.
      * @param message     Message d'erreur.
      */
-    public static void showError(Div feedbackDiv, String message) {
-        feedbackDiv.removeAll();
-        Div msg = new Div();
-        msg.setText("❌ " + message);
-        msg.getStyle().set("color", "red");
-        feedbackDiv.add(msg);
+    public static void showError(String message) {
+        Notification notif = Notification.show("❌ " + message);
+        notif.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        notif.setPosition(Position.TOP_END);
     }
 
     /**
      * Affiche un message de succès.
      *
-     * @param feedbackDiv Zone d'affichage.
      * @param message     Message de confirmation.
      */
-    public static void showSuccess(Div feedbackDiv, String message) {
-        feedbackDiv.removeAll();
-        Div msg = new Div();
-        msg.setText("✅ " + message);
-        msg.getStyle().set("color", "green");
-        feedbackDiv.add(msg);
+    public static void showSuccess(String message) {
+        Notification notif = Notification.show("✅ " + message);
+        notif.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        notif.setPosition(Position.TOP_END);
     }
 }

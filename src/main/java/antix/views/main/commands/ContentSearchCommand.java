@@ -6,7 +6,6 @@ import antix.utils.GridUtils;
 import antix.views.main.PostSelector;
 
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import org.jsoup.Jsoup;
 
 import java.util.List;
@@ -18,19 +17,16 @@ import java.util.stream.Collectors;
  */
 public class ContentSearchCommand implements Command {
     private final Grid<MastodonPost> grid;
-    private final Div feedbackDiv;
     private final PostSelector selector;
 
     /**
      * Constructeur.
      *
      * @param grid        Grille contenant les posts.
-     * @param feedbackDiv Zone d'affichage secondaire (pour feedback).
      * @param selector    Sélecteur de post pour mise en avant.
      */
-    public ContentSearchCommand(Grid<MastodonPost> grid, Div feedbackDiv, PostSelector selector) {
+    public ContentSearchCommand(Grid<MastodonPost> grid, PostSelector selector) {
         this.grid = grid;
-        this.feedbackDiv = feedbackDiv;
         this.selector = selector;
     }
 
@@ -43,7 +39,7 @@ public class ContentSearchCommand implements Command {
     public void execute(String input) {
         String query = input.replaceFirst("c\\s*\"?", "").replaceAll("\"$", "").trim().toLowerCase();
         if (query.isEmpty()) {
-            FeedbackUtils.showError(feedbackDiv, "Veuillez entrer un mot à rechercher (ex: c \"mot\").");
+            FeedbackUtils.showError("Veuillez entrer un mot à rechercher (ex: c \"mot\").");
             return;
         }
 
@@ -55,9 +51,9 @@ public class ContentSearchCommand implements Command {
 
         if (!filtered.isEmpty()) {
             selector.selectAndDisplay(filtered.get(0));
-            FeedbackUtils.showSuccess(feedbackDiv, filtered.size() + " post(s) contiennent : \"" + query + "\"");
+            FeedbackUtils.showSuccess(filtered.size() + " post(s) contiennent : \"" + query + "\"");
         } else {
-            FeedbackUtils.showMessage(feedbackDiv, "Aucun post ne contient : \"" + query + "\"");
+            FeedbackUtils.showMessage("Aucun post ne contient : \"" + query + "\"");
         }
     }
 

@@ -6,7 +6,6 @@ import antix.utils.GridUtils;
 import antix.views.main.PostSelector;
 
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 
 import java.util.List;
 
@@ -17,19 +16,16 @@ import java.util.List;
 public class SelectByIdCommand implements Command {
     private final Grid<MastodonPost> grid;
     private final PostSelector selector;
-    private final Div contentDiv;
 
     /**
      * Constructeur de la commande SelectById.
      *
      * @param grid       Grille contenant les posts.
      * @param selector   Interface de sélection/affichage.
-     * @param contentDiv Zone d'affichage pour les messages utilisateur.
      */
-    public SelectByIdCommand(Grid<MastodonPost> grid, PostSelector selector, Div contentDiv) {
+    public SelectByIdCommand(Grid<MastodonPost> grid, PostSelector selector) {
         this.grid = grid;
         this.selector = selector;
-        this.contentDiv = contentDiv;
     }
 
     /**
@@ -41,7 +37,7 @@ public class SelectByIdCommand implements Command {
     public void execute(String input) {
         String id = input.replaceFirst("select\\s+", "").trim();
         if (id.isEmpty()) {
-            FeedbackUtils.showError(contentDiv, "Veuillez spécifier un ID valide (ex: select 109384881).");
+            FeedbackUtils.showError("Veuillez spécifier un ID valide (ex: select 109384881).");
             return;
         }
 
@@ -51,12 +47,12 @@ public class SelectByIdCommand implements Command {
                 .findFirst()
                 .map(post -> {
                     selector.selectAndDisplay(post);
-                    FeedbackUtils.showSuccess(contentDiv, "Post ID " + id + " sélectionné.");
+                    FeedbackUtils.showSuccess("Post ID " + id + " sélectionné.");
                     return true;
                 }).orElse(false);
 
         if (!found) {
-            FeedbackUtils.showError(contentDiv, "Aucun post trouvé avec l'ID : " + id);
+            FeedbackUtils.showError("Aucun post trouvé avec l'ID : " + id);
         }
     }
 

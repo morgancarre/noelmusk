@@ -6,7 +6,6 @@ import antix.utils.GridUtils;
 import antix.views.main.PostSelector;
 
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,19 +17,16 @@ import java.util.stream.Collectors;
 public class RepliesGreaterCommand implements Command {
     private final Grid<MastodonPost> grid;
     private final PostSelector selector;
-    private final Div feedbackDiv;
 
     /**
      * Constructeur.
      *
      * @param grid        Grille contenant les posts.
      * @param selector    Interface de sélection du post à afficher.
-     * @param feedbackDiv Div contenant le contenu.
      */
-    public RepliesGreaterCommand(Grid<MastodonPost> grid, PostSelector selector, Div feedbackDiv) {
+    public RepliesGreaterCommand(Grid<MastodonPost> grid, PostSelector selector) {
         this.grid = grid;
         this.selector = selector;
-        this.feedbackDiv = feedbackDiv;
     }
 
     /**
@@ -42,13 +38,13 @@ public class RepliesGreaterCommand implements Command {
     public void execute(String input) {
         String[] parts = input.split(">");
         if (parts.length < 2) {
-            FeedbackUtils.showError(feedbackDiv, "Format attendu : replies > n");
+            FeedbackUtils.showError("Format attendu : replies > n");
             return;
         }
 
         String valuePart = parts[1].trim();
         if (valuePart.isEmpty()) {
-            FeedbackUtils.showError(feedbackDiv, "Veuillez spécifier une valeur numérique après >.");
+            FeedbackUtils.showError("Veuillez spécifier une valeur numérique après >.");
             return;
         }
 
@@ -56,7 +52,7 @@ public class RepliesGreaterCommand implements Command {
         try {
             min = Integer.parseInt(valuePart);
         } catch (NumberFormatException e) {
-            FeedbackUtils.showError(feedbackDiv, "Nombre invalide : '" + valuePart + "'");
+            FeedbackUtils.showError("Nombre invalide : '" + valuePart + "'");
             return;
         }
 
@@ -67,9 +63,9 @@ public class RepliesGreaterCommand implements Command {
         grid.setItems(filtered);
         if (!filtered.isEmpty()) {
             selector.selectAndDisplay(filtered.get(0));
-            FeedbackUtils.showSuccess(feedbackDiv, filtered.size() + " post(s) trouvés avec > " + min + " réponses.");
+            FeedbackUtils.showSuccess(filtered.size() + " post(s) trouvés avec > " + min + " réponses.");
         } else {
-            FeedbackUtils.showMessage(feedbackDiv, "Aucun post trouvé avec plus de " + min + " réponses.");
+            FeedbackUtils.showMessage("Aucun post trouvé avec plus de " + min + " réponses.");
         }
     }
 

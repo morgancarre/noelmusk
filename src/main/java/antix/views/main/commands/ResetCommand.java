@@ -5,8 +5,6 @@ import antix.utils.FeedbackUtils;
 import antix.views.main.PostSelector;
 
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
-
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -18,7 +16,6 @@ public class ResetCommand implements Command {
     private final Grid<MastodonPost> grid;
     private final Supplier<List<MastodonPost>> fetcher;
     private final PostSelector selector;
-    private final Div contentDiv;
 
     /**
      * Constructeur de la commande Reset.
@@ -26,14 +23,11 @@ public class ResetCommand implements Command {
      * @param grid       Grille des posts.
      * @param fetcher    Fonction permettant de récupérer les posts (via API).
      * @param selector   Sélecteur/afficheur de post.
-     * @param contentDiv Div contenant la grille.
      */
-    public ResetCommand(Grid<MastodonPost> grid, Supplier<List<MastodonPost>> fetcher, PostSelector selector,
-            Div contentDiv) {
+    public ResetCommand(Grid<MastodonPost> grid, Supplier<List<MastodonPost>> fetcher, PostSelector selector) {
         this.grid = grid;
         this.fetcher = fetcher;
         this.selector = selector;
-        this.contentDiv = contentDiv;
     }
 
     /**
@@ -49,9 +43,9 @@ public class ResetCommand implements Command {
 
         if (!posts.isEmpty()) {
             selector.selectAndDisplay(posts.get(0));
-            FeedbackUtils.showSuccess(contentDiv, "Liste réinitialisée avec " + posts.size() + " posts.");
+            FeedbackUtils.showSuccess("Liste réinitialisée avec " + posts.size() + " posts.");
         } else {
-            FeedbackUtils.showMessage(contentDiv, "Aucun post trouvé à réinitialiser.");
+            FeedbackUtils.showMessage("Aucun post trouvé à réinitialiser.");
         }
     }
 

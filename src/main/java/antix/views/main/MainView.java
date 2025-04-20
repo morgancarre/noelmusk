@@ -35,7 +35,6 @@ import java.util.*;
 public class MainView extends VerticalLayout {
     private final Grid<MastodonPost> grid;
     private final Div contentDiv;
-    private final Div feedbackDiv = new Div();
 
     public MainView() {
         var prompt = new TextField();
@@ -45,7 +44,7 @@ public class MainView extends VerticalLayout {
         var promptContainer = new VerticalLayout(prompt);
         promptContainer.setWidth("100%");
         add(promptContainer);
-
+        
         UI.getCurrent().getPage().executeJs("""
                     const overlay = document.createElement('div');
                     overlay.id = 'click-blocker';
@@ -98,7 +97,6 @@ public class MainView extends VerticalLayout {
         Map<String, Command> commandMap = CommandFactory.build(
                 grid,
                 contentDiv,
-                feedbackDiv,
                 selector,
                 favoris,
                 () -> fetchPostsFromTag("info"),
@@ -112,7 +110,6 @@ public class MainView extends VerticalLayout {
                 return;
 
             playCmd.stop();
-            feedbackDiv.removeAll();
 
             commandMap.getOrDefault(text.split(" ")[0], commandMap.get(text))
                     .execute(text);
@@ -125,16 +122,14 @@ public class MainView extends VerticalLayout {
         grid.setHeight("100%");
         grid.setWidth("50%");
         contentDiv.setHeight("calc(100% - 30px)");
-        feedbackDiv.setHeight("30px");
 
-        VerticalLayout rightSide = new VerticalLayout(feedbackDiv, contentDiv);
+        VerticalLayout rightSide = new VerticalLayout(contentDiv);
         rightSide.setSizeFull();
         rightSide.setSpacing(false);
         rightSide.setPadding(false);
         rightSide.setMargin(false);
 
         contentDiv.setWidth("100%");
-        feedbackDiv.setWidth("100%");
         horizontalLayout.add(grid, rightSide);
         add(horizontalLayout);
 

@@ -14,19 +14,16 @@ import com.vaadin.flow.component.textfield.TextField;
 public class LinkCommand implements Command {
     private final Grid<MastodonPost> grid;
     private final Div contentDiv;
-    private final Div feedbackDiv;
 
     /**
      * Constructeur.
      *
      * @param grid        Grille des posts.
      * @param contentDiv  Zone d'affichage secondaire (feedback lien).
-     * @param feedbackDiv Zone des messages utilisateur.
      */
-    public LinkCommand(Grid<MastodonPost> grid, Div contentDiv, Div feedbackDiv) {
+    public LinkCommand(Grid<MastodonPost> grid, Div contentDiv) {
         this.grid = grid;
         this.contentDiv = contentDiv;
-        this.feedbackDiv = feedbackDiv;
     }
 
     /**
@@ -51,9 +48,9 @@ public class LinkCommand implements Command {
             linkField.getElement().executeJs("navigator.clipboard.writeText($0)", url);
 
             contentDiv.add(linkField);
-            FeedbackUtils.showSuccess(feedbackDiv, "Lien copié dans le presse-papiers !");
+            FeedbackUtils.showSuccess("Lien copié dans le presse-papiers !");
         } else {
-            FeedbackUtils.showError(feedbackDiv, "Aucun post sélectionné pour générer un lien.");
+            FeedbackUtils.showError("Aucun post sélectionné pour générer un lien.");
         }
     }
 

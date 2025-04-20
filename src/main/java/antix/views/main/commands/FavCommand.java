@@ -4,7 +4,6 @@ import antix.model.MastodonPost;
 import antix.utils.FeedbackUtils;
 
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 
 import java.util.List;
 
@@ -15,7 +14,6 @@ import java.util.List;
 public class FavCommand implements Command {
     private final Grid<MastodonPost> grid;
     private final List<MastodonPost> favoris;
-    private final Div contentDiv;
 
     /**
      * Constructeur de la commande Fav.
@@ -23,10 +21,9 @@ public class FavCommand implements Command {
      * @param grid    Grille contenant les posts.
      * @param favoris Liste des posts favoris (locale).
      */
-    public FavCommand(Grid<MastodonPost> grid, List<MastodonPost> favoris, Div contentDiv) {
+    public FavCommand(Grid<MastodonPost> grid, List<MastodonPost> favoris) {
         this.grid = grid;
         this.favoris = favoris;
-        this.contentDiv = contentDiv;
     }
 
     /**
@@ -40,7 +37,7 @@ public class FavCommand implements Command {
         MastodonPost selectedPost = grid.getSelectedItems().stream().findFirst().orElse(null);
 
         if (selectedPost == null) {
-            FeedbackUtils.showError(contentDiv, "Aucun post sélectionné pour ajouter aux favoris.");
+            FeedbackUtils.showError("Aucun post sélectionné pour ajouter aux favoris.");
             return;
         }
 
@@ -48,10 +45,10 @@ public class FavCommand implements Command {
                 .anyMatch(post -> post.getId().equals(selectedPost.getId()));
 
         if (alreadyFavorited) {
-            FeedbackUtils.showMessage(contentDiv, "Ce post est déjà dans les favoris.");
+            FeedbackUtils.showMessage("Ce post est déjà dans les favoris.");
         } else {
             favoris.add(selectedPost);
-            FeedbackUtils.showSuccess(contentDiv, "Post ajouté aux favoris !");
+            FeedbackUtils.showSuccess("Post ajouté aux favoris !");
         }
     }
 
