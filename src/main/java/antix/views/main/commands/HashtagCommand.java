@@ -192,4 +192,20 @@ public class HashtagCommand implements Command {
                 + "  likes:>x, reposts:<y, etc.\n"
                 + "Ex: h squeezie && react || video !politique likes:>5";
     }
+
 }
+
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    

@@ -8,6 +8,7 @@ import antix.views.main.commands.PlayCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -88,6 +89,7 @@ public class MainView extends VerticalLayout {
         contentDiv.setWidthFull();
 
         addIndexColumn(grid);
+        addIndexColumn(grid);
         addContentColumn(grid);
         grid.setItemDetailsRenderer(new ComponentRenderer<>(post -> new Div(Jsoup.parse(post.getContent()).text())));
         grid.setDetailsVisibleOnClick(false);
@@ -146,7 +148,15 @@ public class MainView extends VerticalLayout {
         setFlexGrow(0, promptContainer);
 
         grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
+
+        grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
     }
+
+    private void addIndexColumn(Grid<MastodonPost> grid) {
+        grid.addColumn(post -> {
+            List<MastodonPost> items = grid.getListDataView().getItems().toList();
+            return items.indexOf(post) + 1;
+        }).setAutoWidth(true);
 
     private void addIndexColumn(Grid<MastodonPost> grid) {
         grid.addColumn(post -> {
@@ -157,6 +167,7 @@ public class MainView extends VerticalLayout {
 
     private void addContentColumn(Grid<MastodonPost> grid) {
         grid.addColumn(p -> StringUtils.left(Jsoup.parse(p.getContent()).text(), 150)).setAutoWidth(true);
+        grid.addColumn(p -> StringUtils.left(Jsoup.parse(p.getContent()).text(), 150)).setAutoWidth(true);
     }
 
     public List<MastodonPost> fetchPostsFromTag(String tag) {
@@ -165,6 +176,7 @@ public class MainView extends VerticalLayout {
 
         try {
             var uri = new URIBuilder("https://mastodon.social/api/v1/timelines/tag/" + tag)
+                    .addParameter("limit", "40")
                     .addParameter("limit", "40")
                     .build();
 
@@ -182,6 +194,7 @@ public class MainView extends VerticalLayout {
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
+            return Arrays.stream(mapper.readValue(response.toString(), MastodonPost[].class)).toList();
             return Arrays.stream(mapper.readValue(response.toString(), MastodonPost[].class)).toList();
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
@@ -207,4 +220,4 @@ public class MainView extends VerticalLayout {
             grid.setDetailsVisible(post, true);
         }
     }
-}
+};
