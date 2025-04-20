@@ -1,0 +1,69 @@
+package antix.views.main.commands;
+
+import antix.model.MastodonPost;
+import antix.utils.FeedbackUtils;
+
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.textfield.TextField;
+
+/**
+ * Commande permettant de copier le lien d’un post sélectionné.
+ * Le lien est automatiquement copié dans le presse-papiers.
+ */
+public class LinkCommand implements Command {
+    private final Grid<MastodonPost> grid;
+    private final Div contentDiv;
+    private final Div feedbackDiv;
+
+    /**
+     * Constructeur.
+     *
+     * @param grid        Grille des posts.
+     * @param contentDiv  Zone d'affichage secondaire (feedback lien).
+     * @param feedbackDiv Zone des messages utilisateur.
+     */
+    public LinkCommand(Grid<MastodonPost> grid, Div contentDiv, Div feedbackDiv) {
+        this.grid = grid;
+        this.contentDiv = contentDiv;
+        this.feedbackDiv = feedbackDiv;
+    }
+
+    /**
+     * Génére un champ contenant l’URL du post, prêt à être copié.
+     *
+     * @param input Entrée utilisateur (non utilisée).
+     */
+    @Override
+    public void execute(String input) {
+        contentDiv.removeAll();
+        MastodonPost post = grid.getSelectedItems().stream().findFirst().orElse(null);
+
+        if (post != null) {
+            String url = "https://mastodon.social/@" + post.getAccount().getUsername() + "/" + post.getId();
+
+            TextField linkField = new TextField("Lien du post");
+            linkField.setValue(url);
+            linkField.setReadOnly(true);
+            linkField.setWidthFull();
+            linkField.focus();
+
+            linkField.getElement().executeJs("navigator.clipboard.writeText($0)", url);
+
+            contentDiv.add(linkField);
+            FeedbackUtils.showSuccess(feedbackDiv, "Lien copié dans le presse-papiers !");
+        } else {
+            FeedbackUtils.showError(feedbackDiv, "Aucun post sélectionné pour générer un lien.");
+        }
+    }
+
+    /**
+     * Retourne une description de la commande.
+     *
+     * @return Texte descriptif pour la commande d'aide.
+     */
+    @Override
+    public String getDescription() {
+        return "l / link : copier le lien du post sélectionné dans le presse-papier";
+    }
+}
