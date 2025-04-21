@@ -2,6 +2,7 @@ package antix.views.main.commands;
 
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 
 import antix.components.CommandCard;
 
@@ -22,7 +23,8 @@ public class HelpCommand extends Command {
      * @param contentDiv Zone dans laquelle afficher l'aide.
      */
     public HelpCommand(Map<String, Command> commandMap, Div contentDiv) {
-        super("Help", "? / help : affiche cette aide");
+        super("Help",
+                "? / help : affiche les différentes commandes\n ? / help [commande] : affiche une aide sur une commande particulière");
         this.commandMap = commandMap;
         this.contentDiv = contentDiv;
     }
@@ -35,28 +37,43 @@ public class HelpCommand extends Command {
     @Override
     public void execute(String input) {
         contentDiv.removeAll();
-
         Div helpDiv = new Div();
-        helpDiv.add(new H2("Commandes disponibles :"));
         helpDiv.getStyle().set("white-space", "pre-wrap");
 
-        Div commandsDiv = new Div();
-        commandsDiv.getStyle().set("display", "flex");
-        commandsDiv.getStyle().set("flex-wrap", "wrap");
-        helpDiv.add(commandsDiv);
+        // Extraire le nom de la commande après "help"
+        String[] parts = input.trim().split("\\s+", 2);
+        if (parts.length > 1) {
+            String commandName = parts[1].toLowerCase();
+            Command command = commandMap.get(commandName);
 
-
-        Set<String> seenDescriptions = new HashSet<>();
-        Set<Command> uniqueCommands = new LinkedHashSet<>(commandMap.values());
-
-        uniqueCommands.forEach(cmd -> {
-            String desc = cmd.getDescription();
-            if (seenDescriptions.add(desc)) {
-                commandsDiv.add(new CommandCard(cmd));
-                // helpDiv.add(new Paragraph(desc));
+            if (command != null) {
+                // Afficher uniquement la description de la commande spécifiée
+                helpDiv.add(new H2("Commande : " + commandName));
+                helpDiv.add(new H3("Description :"));
+                helpDiv.add(new Div(command.getDescription()));
+            } else {
+                // Afficher un message d'erreur si la commande n'existe pas
+                helpDiv.add(new Div("Commande inconnue : " + commandName));
             }
-        });
-
+        } else {
+            // Si aucune commande spécifique n'est demandée, afficher toutes les commandes
+            helpDiv.add(new H2("Commandes disponibles :"));
+            Div commandsDiv = new Div();
+            commandsDiv.getStyle().set("display", "flex");
+            commandsDiv.getStyle().set("flex-wrap", "wrap");
+    
+            Set<String> seenDescriptions = new HashSet<>();
+            Set<Command> uniqueCommands = new LinkedHashSet<>(commandMap.values());
+    
+            uniqueCommands.forEach(cmd -> {
+                String desc = cmd.getDescription();
+                if (seenDescriptions.add(desc)) {
+                    commandsDiv.add(new CommandCard(cmd));
+                    // helpDiv.add(new Paragraph(desc));
+                }
+            });
+            helpDiv.add(commandsDiv);
+        }
         contentDiv.add(helpDiv);
     }
 }
