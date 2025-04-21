@@ -37,7 +37,7 @@ public class LinkCommand implements Command {
         MastodonPost post = grid.getSelectedItems().stream().findFirst().orElse(null);
 
         if (post != null) {
-            String url = "https://mastodon.social/@" + post.getAccount().getUsername() + "/" + post.getId();
+            String url = post.getUrl();
 
             TextField linkField = new TextField("Lien du post");
             linkField.setValue(url);
