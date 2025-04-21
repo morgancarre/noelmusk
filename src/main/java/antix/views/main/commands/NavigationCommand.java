@@ -13,8 +13,8 @@ public abstract class NavigationCommand extends Command {
     protected final PostSelector selector;
 
     // Constructeur pour initialiser le titre, la description, la grid et le selector
-    public NavigationCommand(String title, String description, Grid<MastodonPost> grid, PostSelector selector) {
-        super(title, description); // Appelle le constructeur de Command
+    public NavigationCommand(List<String> aliases, String title, String description, Grid<MastodonPost> grid, PostSelector selector) {
+        super(aliases, title, description); // Appelle le constructeur de Command
         this.grid = grid;
         this.selector = selector;
     }

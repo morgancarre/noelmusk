@@ -20,7 +20,7 @@ public class PreviousCommand extends NavigationCommand {
      * @param selector Sélecteur de post pour affichage.
      */
     public PreviousCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super("Previous", "p / previous : sélectionner le post précédent", grid, selector);
+        super(List.of("p", "previous"), "Previous", "p / previous : sélectionner le post précédent", grid, selector);
     }
 
     /**

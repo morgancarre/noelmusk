@@ -28,17 +28,17 @@ public class HashtagCommand extends Command {
     /**
      * Constructeur.
      *
-     * @param grid        Grille contenant les posts.
-     * @param tagFetcher  Fonction de récupération des posts par tag.
-     * @param selector    Sélecteur pour afficher un post.
+     * @param grid       Grille contenant les posts.
+     * @param tagFetcher Fonction de récupération des posts par tag.
+     * @param selector   Sélecteur pour afficher un post.
      */
     public HashtagCommand(Grid<MastodonPost> grid,
             Function<String, List<MastodonPost>> tagFetcher,
             PostSelector selector) {
-        super("Hashtag", "h <tag(s)> : recherche avancée avec opérateurs :\n"
+        super(List.of("h", "hashtag"), "Hashtag", "h <tag(s)> : recherche avancée avec opérateurs :\n"
                 + "  && (et), || (ou), ! (exclure),\n"
                 + "  likes:>x, reposts:<y, etc.\n"
-                + "Ex: h squeezie && react || video !politique likes:>5");             
+                + "Ex: h squeezie && react || video !politique likes:>5");
         this.grid = grid;
         this.tagFetcher = tagFetcher;
         this.selector = selector;
@@ -192,18 +192,3 @@ public class HashtagCommand extends Command {
     }
 
 }
-
-    
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    

@@ -1,5 +1,7 @@
 package antix.views.main.commands;
 
+import java.util.List;
+
 /**
  * Commande qui arrête la lecture automatique lancée par la commande Play.
  */
@@ -12,7 +14,7 @@ public class StopCommand extends Command {
      * @param playCommand Référence à la commande Play à contrôler.
      */
     public StopCommand(PlayCommand playCommand) {
-        super("Stop", "stop : arrête la lecture automatique");
+        super(List.of("stop"), "Stop", "stop : arrête la lecture automatique");
         this.playCommand = playCommand;
     }
 

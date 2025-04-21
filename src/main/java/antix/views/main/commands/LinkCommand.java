@@ -3,6 +3,8 @@ package antix.views.main.commands;
 import antix.model.MastodonPost;
 import antix.utils.FeedbackUtils;
 
+import java.util.List;
+
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.textfield.TextField;
@@ -22,7 +24,7 @@ public class LinkCommand extends Command {
      * @param contentDiv  Zone d'affichage secondaire (feedback lien).
      */
     public LinkCommand(Grid<MastodonPost> grid, Div contentDiv) {
-        super("Link", "l / link : copier le lien du post sélectionné dans le presse-papier");
+        super(List.of("l", "link"), "Link", "Copier le lien du post sélectionné dans le presse-papier");
         this.grid = grid;
         this.contentDiv = contentDiv;
     }

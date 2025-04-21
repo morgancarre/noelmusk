@@ -24,7 +24,7 @@ public class TagListCommand extends Command {
      * @param contentDiv Zone où afficher les résultats.
      */
     public TagListCommand(Grid<MastodonPost> grid, Div contentDiv) {
-        super("Tag List", "taglist : liste les tags les plus fréquents dans les posts affichés");
+        super(List.of("taglist"), "Tag List", "taglist : liste les tags les plus fréquents dans les posts affichés");
         this.grid = grid;
         this.contentDiv = contentDiv;
     }

@@ -25,7 +25,7 @@ public class RepliesGreaterCommand extends Command {
      * @param selector    Interface de sélection du post à afficher.
      */
     public RepliesGreaterCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super("Replies Greater", "r > <n> / replies > <n> : filtrer les posts avec plus de n réponses");
+        super(List.of("r", "replies"), "Replies Greater", "r > <n> / replies > <n> : filtrer les posts avec plus de n réponses");
         this.grid = grid;
         this.selector = selector;
     }

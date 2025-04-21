@@ -22,7 +22,7 @@ public class FavCommand extends Command {
      * @param favoris Liste des posts favoris (locale).
      */
     public FavCommand(Grid<MastodonPost> grid, List<MastodonPost> favoris) {
-        super("Fav", "Ajoute le post sélectionné aux favoris.");
+        super(List.of("f", "fav"), "Favoris", "Ajoute le post sélectionné aux favoris.");
         this.grid = grid;
         this.favoris = favoris;
     }

@@ -23,7 +23,7 @@ public class HelpCommand extends Command {
      * @param contentDiv Zone dans laquelle afficher l'aide.
      */
     public HelpCommand(Map<String, Command> commandMap, Div contentDiv) {
-        super("Help",
+        super(List.of("?", "help"), "Help",
                 "? / help : affiche les différentes commandes\n ? / help [commande] : affiche une aide sur une commande particulière");
         this.commandMap = commandMap;
         this.contentDiv = contentDiv;

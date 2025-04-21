@@ -20,7 +20,7 @@ public class NextCommand extends NavigationCommand {
      * @param selector Sélecteur de post pour affichage.
      */
     public NextCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super("Next", "n / next : sélectionner le post suivant", grid, selector);
+        super(List.of("n", "next"), "Next", "Sélectionner le post suivant", grid, selector);
     }
 
     /**

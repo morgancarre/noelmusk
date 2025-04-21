@@ -23,7 +23,7 @@ public class SortRepliesCommand extends Command {
      * @param selector Permet d'afficher le post après tri.
      */
     public SortRepliesCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super("Sort Replies", "sort replies : trie les posts par nombre de réponses décroissant");
+        super(List.of("sort replies"), "Sort Replies", "sort replies : trie les posts par nombre de réponses décroissant");
         this.grid = grid;
         this.selector = selector;
     }

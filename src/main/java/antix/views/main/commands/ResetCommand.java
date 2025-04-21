@@ -25,7 +25,7 @@ public class ResetCommand extends Command {
      * @param selector   Sélecteur/afficheur de post.
      */
     public ResetCommand(Grid<MastodonPost> grid, Supplier<List<MastodonPost>> fetcher, PostSelector selector) {
-        super("Reset", "reset : réinitialise la liste avec les derniers posts du tag par défaut");
+        super(List.of("reset"), "Reset", "reset : réinitialise la liste avec les derniers posts du tag par défaut");
         this.grid = grid;
         this.fetcher = fetcher;
         this.selector = selector;

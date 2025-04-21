@@ -23,7 +23,7 @@ public class TopCommand extends NavigationCommand {
      * @param selector Le sélecteur responsable de l'affichage du post choisi.
      */
     public TopCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super("Top", "top : sélectionne le post avec le plus de réponses", grid, selector);
+        super(List.of("top"), "Top", "top : sélectionne le post avec le plus de réponses", grid, selector);
     }
 
     /**

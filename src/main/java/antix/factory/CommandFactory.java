@@ -38,50 +38,32 @@ public class CommandFactory {
             Function<String, List<MastodonPost>> tagFetcher) {
         Map<String, Command> commands = new LinkedHashMap<>();
 
-        commands.put("reset", new ResetCommand(grid, resetFetcher, selector));
-        commands.put("replies", new RepliesGreaterCommand(grid, selector));
-        commands.put("r", commands.get("replies")); // alias
-        commands.put("select", new SelectByIdCommand(grid, selector));
-        commands.put("c", new ContentSearchCommand(grid, selector));
-        commands.put("h", new HashtagCommand(grid, tagFetcher, selector));
-        commands.put("hashtag", commands.get("h")); // alias
-        commands.put("l", new LinkCommand(grid, contentDiv));
-        commands.put("link", commands.get("l")); // alias
-        commands.put("f", new FavCommand(grid, favoris));
-        commands.put("fav", commands.get("f")); // alias
-
-        // Commande d'aide
-        HelpCommand helpCmd = new HelpCommand(commands, contentDiv);
-        commands.put("help", helpCmd);
-        commands.put("?", helpCmd); // alias
-
-        // Navigation simple (pas besoin de message)
-        Command next = new NextCommand(grid, selector);
-        Command prev = new PreviousCommand(grid, selector);
-        Command top = new TopCommand(grid, selector);
-        Command bottom = new BottomCommand(grid, selector);
-        Command rand = new RandCommand(grid, selector);
-        Command play = new PlayCommand(grid);
-        Command stop = new StopCommand((PlayCommand) play);
-
-        commands.put("next", next);
-        commands.put("n", next);
-        commands.put("previous", prev);
-        commands.put("p", prev);
-        commands.put("top", top);
-        commands.put("bottom", bottom);
-        commands.put("rand", rand);
-        commands.put("random", rand);
-        commands.put("play", play);
-        commands.put("stop", stop);
-
-        // Commandes spécifiques
-        commands.put("g", new GotoCommand(grid, selector));
-        commands.put("goto", commands.get("g"));
-
-        commands.put("sort replies", new SortRepliesCommand(grid, selector));
-        commands.put("taglist", new TagListCommand(grid, contentDiv));
+        addCommands(new ResetCommand(grid, resetFetcher, selector), commands);
+        addCommands(new RepliesGreaterCommand(grid, selector), commands);
+        addCommands(new SelectByIdCommand(grid, selector), commands);
+        addCommands(new ContentSearchCommand(grid, selector), commands);
+        addCommands(new HashtagCommand(grid, tagFetcher, selector), commands);
+        addCommands(new LinkCommand(grid, contentDiv), commands);
+        addCommands(new FavCommand(grid, favoris), commands);
+        addCommands(new HelpCommand(commands, contentDiv), commands);
+        addCommands(new NextCommand(grid, selector), commands);
+        addCommands(new PreviousCommand(grid, selector), commands);
+        addCommands(new TopCommand(grid, selector), commands);
+        addCommands(new BottomCommand(grid, selector), commands);
+        PlayCommand play = new PlayCommand(grid);
+        addCommands(play, commands);
+        addCommands(new StopCommand(play), commands);
+        addCommands(new GotoCommand(grid, selector), commands);
+        addCommands(new SortRepliesCommand(grid, selector), commands);
+        addCommands(new TagListCommand(grid, contentDiv), commands);
 
         return commands;
+    }
+
+    private static void addCommands(Command command, Map<String, Command> commandsMap) {
+        List<String> aliases = command.getAliases();
+        for (String alias : aliases) {
+            commandsMap.put(alias, command);
+        }
     }
 }
