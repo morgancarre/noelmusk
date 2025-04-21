@@ -14,9 +14,6 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.Query;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +32,7 @@ import java.util.*;
 @Route("")
 public class MainView extends VerticalLayout {
     private final Grid<MastodonPost> grid;
+    private final Div previewDiv;
     private final Div contentDiv;
 
     public MainView() {
@@ -79,15 +77,14 @@ public class MainView extends VerticalLayout {
         setAlignItems(FlexComponent.Alignment.CENTER);
 
         this.grid = new Grid<>(MastodonPost.class, false);
+        this.previewDiv = new Div();
+        previewDiv.add(grid);
         this.contentDiv = new Div();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         contentDiv.setWidthFull();
 
         addIndexColumn(grid);
         addContentColumn(grid);
-        grid.setItemDetailsRenderer(new ComponentRenderer<>(post -> new Div(Jsoup.parse(post.getContent()).text())));
-        grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
-        grid.setDetailsVisibleOnClick(false);
 
         List<MastodonPost> favoris = new ArrayList<>();
         PostSelector selector = this::selectAndDisplay;
@@ -145,7 +142,6 @@ public class MainView extends VerticalLayout {
         setFlexGrow(1, horizontalLayout);
         setFlexGrow(0, promptContainer);
 
-        grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
     }
 
     private void addIndexColumn(Grid<MastodonPost> grid) {
@@ -186,12 +182,6 @@ public class MainView extends VerticalLayout {
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void selectItemListener(Grid<MastodonPost> grid, Div contentDiv,
-            SelectionEvent<Grid<MastodonPost>, MastodonPost> event) {
-        grid.getDataProvider().fetch(new Query<>()).forEach(p -> grid.setDetailsVisible(p, false));
-        event.getFirstSelectedItem().ifPresent(this::selectAndDisplay);
     }
 
     public void selectAndDisplay(MastodonPost post) {

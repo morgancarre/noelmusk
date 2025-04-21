@@ -11,7 +11,7 @@ import com.vaadin.flow.component.textfield.TextField;
  * Commande permettant de copier le lien d’un post sélectionné.
  * Le lien est automatiquement copié dans le presse-papiers.
  */
-public class LinkCommand implements Command {
+public class LinkCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final Div contentDiv;
 
@@ -22,6 +22,7 @@ public class LinkCommand implements Command {
      * @param contentDiv  Zone d'affichage secondaire (feedback lien).
      */
     public LinkCommand(Grid<MastodonPost> grid, Div contentDiv) {
+        super("Link", "l / link : copier le lien du post sélectionné dans le presse-papier");
         this.grid = grid;
         this.contentDiv = contentDiv;
     }
@@ -52,15 +53,5 @@ public class LinkCommand implements Command {
         } else {
             FeedbackUtils.showError("Aucun post sélectionné pour générer un lien.");
         }
-    }
-
-    /**
-     * Retourne une description de la commande.
-     *
-     * @return Texte descriptif pour la commande d'aide.
-     */
-    @Override
-    public String getDescription() {
-        return "l / link : copier le lien du post sélectionné dans le presse-papier";
     }
 }

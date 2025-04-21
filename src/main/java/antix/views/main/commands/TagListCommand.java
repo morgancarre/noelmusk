@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * visibles.
  * Utile pour identifier les sujets dominants.
  */
-public class TagListCommand implements Command {
+public class TagListCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final Div contentDiv;
 
@@ -24,6 +24,7 @@ public class TagListCommand implements Command {
      * @param contentDiv Zone où afficher les résultats.
      */
     public TagListCommand(Grid<MastodonPost> grid, Div contentDiv) {
+        super("Tag List", "taglist : liste les tags les plus fréquents dans les posts affichés");
         this.grid = grid;
         this.contentDiv = contentDiv;
     }
@@ -59,15 +60,5 @@ public class TagListCommand implements Command {
         div.getStyle().set("white-space", "pre-wrap");
         div.setText(out.toString());
         contentDiv.add(div);
-    }
-
-    /**
-     * Description de la commande pour l’aide.
-     *
-     * @return Chaîne explicative.
-     */
-    @Override
-    public String getDescription() {
-        return "taglist : liste les tags les plus fréquents dans les posts affichés";
     }
 }

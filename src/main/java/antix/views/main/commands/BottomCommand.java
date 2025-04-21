@@ -22,17 +22,7 @@ public class BottomCommand extends NavigationCommand {
      * @param selector Interface permettant d'afficher un post dans l'UI.
      */
     public BottomCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super(grid, selector);
-    }
-
-    /**
-     * Retourne une description de la commande pour l'aide.
-     *
-     * @return Chaîne descriptive de la commande.
-     */
-    @Override
-    public String getDescription() {
-        return "bottom : sélectionne le post avec le moins de réponses";
+        super("Bottom", "Sélectionne le post avec le moins de réponses.", grid, selector);
     }
 
     /**

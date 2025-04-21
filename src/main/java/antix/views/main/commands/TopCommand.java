@@ -23,17 +23,7 @@ public class TopCommand extends NavigationCommand {
      * @param selector Le sélecteur responsable de l'affichage du post choisi.
      */
     public TopCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super(grid, selector);
-    }
-
-    /**
-     * Retourne la description de la commande.
-     *
-     * @return Une chaîne décrivant la commande.
-     */
-    @Override
-    public String getDescription() {
-        return "top : sélectionne le post avec le plus de réponses";
+        super("Top", "top : sélectionne le post avec le plus de réponses", grid, selector);
     }
 
     /**

@@ -11,7 +11,7 @@ import java.util.List;
  * Commande permettant d'ajouter un post aux favoris locaux.
  * Le post sélectionné est ajouté s’il n’est pas déjà présent.
  */
-public class FavCommand implements Command {
+public class FavCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final List<MastodonPost> favoris;
 
@@ -22,6 +22,7 @@ public class FavCommand implements Command {
      * @param favoris Liste des posts favoris (locale).
      */
     public FavCommand(Grid<MastodonPost> grid, List<MastodonPost> favoris) {
+        super("Fav", "Ajoute le post sélectionné aux favoris.");
         this.grid = grid;
         this.favoris = favoris;
     }
@@ -50,15 +51,5 @@ public class FavCommand implements Command {
             favoris.add(selectedPost);
             FeedbackUtils.showSuccess("Post ajouté aux favoris !");
         }
-    }
-
-    /**
-     * Retourne une description de la commande.
-     *
-     * @return Texte explicatif.
-     */
-    @Override
-    public String getDescription() {
-        return "f / fav : ajouter le post sélectionné aux favoris";
     }
 }

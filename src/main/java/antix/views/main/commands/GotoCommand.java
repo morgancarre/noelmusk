@@ -14,7 +14,7 @@ import java.util.List;
  * affichée.
  * L'index est 1-based (commence à 1 pour l'utilisateur).
  */
-public class GotoCommand implements Command {
+public class GotoCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final PostSelector selector;
 
@@ -25,6 +25,7 @@ public class GotoCommand implements Command {
      * @param selector    Sélecteur de post pour affichage.
      */
     public GotoCommand(Grid<MastodonPost> grid, PostSelector selector) {
+        super("Goto", "g <n> / goto <n> : aller au post numéro n");
         this.grid = grid;
         this.selector = selector;
     }
@@ -57,10 +58,5 @@ public class GotoCommand implements Command {
         } else {
             FeedbackUtils.showError("Index hors limites. Il doit être entre 1 et " + posts.size() + ".");
         }
-    }
-
-    @Override
-    public String getDescription() {
-        return "g <n> / goto <n> : aller au post numéro n";
     }
 }

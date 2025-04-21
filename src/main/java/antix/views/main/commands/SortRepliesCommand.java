@@ -12,7 +12,7 @@ import java.util.List;
  * Commande qui trie les posts par nombre de réponses décroissant.
  * Le post ayant le plus de réponses est sélectionné automatiquement.
  */
-public class SortRepliesCommand implements Command {
+public class SortRepliesCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final PostSelector selector;
 
@@ -23,6 +23,7 @@ public class SortRepliesCommand implements Command {
      * @param selector Permet d'afficher le post après tri.
      */
     public SortRepliesCommand(Grid<MastodonPost> grid, PostSelector selector) {
+        super("Sort Replies", "sort replies : trie les posts par nombre de réponses décroissant");
         this.grid = grid;
         this.selector = selector;
     }
@@ -42,15 +43,5 @@ public class SortRepliesCommand implements Command {
         if (!items.isEmpty()) {
             selector.selectAndDisplay(items.get(0));
         }
-    }
-
-    /**
-     * Description utilisée dans l'aide.
-     *
-     * @return Chaîne de description.
-     */
-    @Override
-    public String getDescription() {
-        return "sort replies : trie les posts par nombre de réponses décroissant";
     }
 }

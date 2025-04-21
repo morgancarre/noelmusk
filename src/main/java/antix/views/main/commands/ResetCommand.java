@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  * Commande permettant de réinitialiser l'affichage avec les derniers posts.
  * Elle recharge les données depuis un tag par défaut (ex. \"info\").
  */
-public class ResetCommand implements Command {
+public class ResetCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final Supplier<List<MastodonPost>> fetcher;
     private final PostSelector selector;
@@ -25,6 +25,7 @@ public class ResetCommand implements Command {
      * @param selector   Sélecteur/afficheur de post.
      */
     public ResetCommand(Grid<MastodonPost> grid, Supplier<List<MastodonPost>> fetcher, PostSelector selector) {
+        super("Reset", "reset : réinitialise la liste avec les derniers posts du tag par défaut");
         this.grid = grid;
         this.fetcher = fetcher;
         this.selector = selector;
@@ -47,15 +48,5 @@ public class ResetCommand implements Command {
         } else {
             FeedbackUtils.showMessage("Aucun post trouvé à réinitialiser.");
         }
-    }
-
-    /**
-     * Description de la commande pour l'aide.
-     *
-     * @return Description textuelle.
-     */
-    @Override
-    public String getDescription() {
-        return "reset : réinitialise la liste avec les derniers posts du tag par défaut";
     }
 }

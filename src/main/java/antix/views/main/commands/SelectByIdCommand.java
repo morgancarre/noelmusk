@@ -13,7 +13,7 @@ import java.util.List;
  * Commande permettant de sélectionner un post via son identifiant (ID exact).
  * Utile pour une recherche précise.
  */
-public class SelectByIdCommand implements Command {
+public class SelectByIdCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final PostSelector selector;
 
@@ -24,6 +24,7 @@ public class SelectByIdCommand implements Command {
      * @param selector   Interface de sélection/affichage.
      */
     public SelectByIdCommand(Grid<MastodonPost> grid, PostSelector selector) {
+        super("Select", "select <id> : sélectionner un post via son identifiant unique");
         this.grid = grid;
         this.selector = selector;
     }
@@ -54,10 +55,5 @@ public class SelectByIdCommand implements Command {
         if (!found) {
             FeedbackUtils.showError("Aucun post trouvé avec l'ID : " + id);
         }
-    }
-
-    @Override
-    public String getDescription() {
-        return "select <id> : sélectionne le post avec l'identifiant donné";
     }
 }

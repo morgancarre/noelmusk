@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * régulier.
  * Ex : play 5 → défilement toutes les 5 secondes.
  */
-public class PlayCommand implements Command {
+public class PlayCommand extends Command {
 
     private Timer timer;
     private final Grid<MastodonPost> grid;
@@ -26,6 +26,7 @@ public class PlayCommand implements Command {
      * @param grid Grille contenant les posts.
      */
     public PlayCommand(Grid<MastodonPost> grid) {
+        super("Play", "play <n> : change de post automatiquement toutes les n secondes (rotation circulaire)");
         this.grid = grid;
     }
 
@@ -83,10 +84,5 @@ public class PlayCommand implements Command {
             timer.cancel();
             timer = null;
         }
-    }
-
-    @Override
-    public String getDescription() {
-        return "play <n> : change de post automatiquement toutes les n secondes (rotation circulaire)";
     }
 }

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * Commande filtrant les posts ayant plus de n réponses.
  * Exemple : \"replies > 10\" ou \"r > 5\"
  */
-public class RepliesGreaterCommand implements Command {
+public class RepliesGreaterCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final PostSelector selector;
 
@@ -25,6 +25,7 @@ public class RepliesGreaterCommand implements Command {
      * @param selector    Interface de sélection du post à afficher.
      */
     public RepliesGreaterCommand(Grid<MastodonPost> grid, PostSelector selector) {
+        super("Replies Greater", "r > <n> / replies > <n> : filtrer les posts avec plus de n réponses");
         this.grid = grid;
         this.selector = selector;
     }
@@ -67,15 +68,5 @@ public class RepliesGreaterCommand implements Command {
         } else {
             FeedbackUtils.showMessage("Aucun post trouvé avec plus de " + min + " réponses.");
         }
-    }
-
-    /**
-     * Description utilisée dans l'aide.
-     *
-     * @return Description texte.
-     */
-    @Override
-    public String getDescription() {
-        return "r > <n> / replies > <n> : filtrer les posts avec plus de n réponses";
     }
 }

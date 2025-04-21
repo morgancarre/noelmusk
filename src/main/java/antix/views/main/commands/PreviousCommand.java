@@ -20,17 +20,7 @@ public class PreviousCommand extends NavigationCommand {
      * @param selector Sélecteur de post pour affichage.
      */
     public PreviousCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super(grid, selector);
-    }
-
-    /**
-     * Retourne une description textuelle de la commande.
-     *
-     * @return Une chaîne pour l'aide.
-     */
-    @Override
-    public String getDescription() {
-        return "p / previous : sélectionner le post précédent";
+        super("Previous", "p / previous : sélectionner le post précédent", grid, selector);
     }
 
     /**

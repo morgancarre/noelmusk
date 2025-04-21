@@ -3,7 +3,7 @@ package antix.views.main.commands;
 /**
  * Commande qui arrête la lecture automatique lancée par la commande Play.
  */
-public class StopCommand implements Command {
+public class StopCommand extends Command {
     private final PlayCommand playCommand;
 
     /**
@@ -12,6 +12,7 @@ public class StopCommand implements Command {
      * @param playCommand Référence à la commande Play à contrôler.
      */
     public StopCommand(PlayCommand playCommand) {
+        super("Stop", "stop : arrête la lecture automatique");
         this.playCommand = playCommand;
     }
 
@@ -23,10 +24,5 @@ public class StopCommand implements Command {
     @Override
     public void execute(String input) {
         playCommand.stop();
-    }
-
-    @Override
-    public String getDescription() {
-        return "stop : arrête la lecture automatique";
     }
 }

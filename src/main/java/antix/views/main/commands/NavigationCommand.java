@@ -8,15 +8,18 @@ import com.vaadin.flow.component.grid.Grid;
 
 import java.util.List;
 
-public abstract class NavigationCommand implements Command {
+public abstract class NavigationCommand extends Command {
     protected final Grid<MastodonPost> grid;
     protected final PostSelector selector;
 
-    public NavigationCommand(Grid<MastodonPost> grid, PostSelector selector) {
+    // Constructeur pour initialiser le titre, la description, la grid et le selector
+    public NavigationCommand(String title, String description, Grid<MastodonPost> grid, PostSelector selector) {
+        super(title, description); // Appelle le constructeur de Command
         this.grid = grid;
         this.selector = selector;
     }
 
+    // Méthode abstraite pour obtenir le post cible
     protected abstract MastodonPost getTargetPost(List<MastodonPost> items, MastodonPost current);
 
     @Override

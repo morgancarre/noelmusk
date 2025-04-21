@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Commande permettant de rechercher un mot dans le contenu textuel des posts.
  * Exemple : c "pouvoir"
  */
-public class ContentSearchCommand implements Command {
+public class ContentSearchCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final PostSelector selector;
 
@@ -26,6 +26,7 @@ public class ContentSearchCommand implements Command {
      * @param selector    Sélecteur de post pour mise en avant.
      */
     public ContentSearchCommand(Grid<MastodonPost> grid, PostSelector selector) {
+        super("Content Search", "Recherche un mot dans le contenu des posts.");
         this.grid = grid;
         this.selector = selector;
     }
@@ -55,15 +56,5 @@ public class ContentSearchCommand implements Command {
         } else {
             FeedbackUtils.showMessage("Aucun post ne contient : \"" + query + "\"");
         }
-    }
-
-    /**
-     * Description affichée dans l'aide.
-     *
-     * @return Texte explicatif.
-     */
-    @Override
-    public String getDescription() {
-        return "c \"mot\" : recherche dans le contenu des posts";
     }
 }

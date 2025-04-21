@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * - h actus !politique likes:>5 reposts:<3
  * - h dev || ai && code !blabla
  */
-public class HashtagCommand implements Command {
+public class HashtagCommand extends Command {
     private final Grid<MastodonPost> grid;
     private final Function<String, List<MastodonPost>> tagFetcher;
     private final PostSelector selector;
@@ -35,6 +35,10 @@ public class HashtagCommand implements Command {
     public HashtagCommand(Grid<MastodonPost> grid,
             Function<String, List<MastodonPost>> tagFetcher,
             PostSelector selector) {
+        super("Hashtag", "h <tag(s)> : recherche avancée avec opérateurs :\n"
+                + "  && (et), || (ou), ! (exclure),\n"
+                + "  likes:>x, reposts:<y, etc.\n"
+                + "Ex: h squeezie && react || video !politique likes:>5");             
         this.grid = grid;
         this.tagFetcher = tagFetcher;
         this.selector = selector;
