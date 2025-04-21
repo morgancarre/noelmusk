@@ -16,6 +16,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.apache.commons.lang3.StringUtils;
@@ -40,10 +41,6 @@ public class MainView extends VerticalLayout {
         var prompt = new TextField();
         prompt.setId("prompt-field");
         prompt.setWidth("100%");
-
-        var promptContainer = new VerticalLayout(prompt);
-        promptContainer.setWidth("100%");
-        add(promptContainer);
         
         UI.getCurrent().getPage().executeJs("""
                     const overlay = document.createElement('div');
@@ -89,6 +86,7 @@ public class MainView extends VerticalLayout {
         addIndexColumn(grid);
         addContentColumn(grid);
         grid.setItemDetailsRenderer(new ComponentRenderer<>(post -> new Div(Jsoup.parse(post.getContent()).text())));
+        grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
         grid.setDetailsVisibleOnClick(false);
 
         List<MastodonPost> favoris = new ArrayList<>();
@@ -117,27 +115,35 @@ public class MainView extends VerticalLayout {
             prompt.setValue("");
         });
 
+        // Créer un HorizontalLayout pour contenir la grid et le contenu
         var horizontalLayout = new HorizontalLayout();
         horizontalLayout.setSizeFull();
+
+        // Ajuster la taille de la grid
         grid.setHeight("100%");
         grid.setWidth("50%");
-        contentDiv.setHeight("calc(100% - 30px)");
 
-        VerticalLayout rightSide = new VerticalLayout(contentDiv);
-        rightSide.setSizeFull();
-        rightSide.setSpacing(false);
-        rightSide.setPadding(false);
-        rightSide.setMargin(false);
+        // Ajuster le contentDiv
+        contentDiv.setHeight("100%");
+        contentDiv.setWidth("50%");
 
-        contentDiv.setWidth("100%");
-        horizontalLayout.add(grid, rightSide);
+        // Ajouter les composants au layout horizontal
+        horizontalLayout.add(grid, contentDiv);
+
+        // Remplacer les add() individuels par l'ajout du layout horizontal
         add(horizontalLayout);
 
+        // Ajouter le prompt en bas
+        var promptContainer = new VerticalLayout(prompt);
         promptContainer.setWidth("100%");
         promptContainer.setPadding(false);
         promptContainer.setSpacing(false);
         promptContainer.setMargin(false);
+        add(promptContainer);
+
+        // Ajuster les flex grow
         setFlexGrow(1, horizontalLayout);
+        setFlexGrow(0, promptContainer);
 
         grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
     }
@@ -183,7 +189,7 @@ public class MainView extends VerticalLayout {
     }
 
     private void selectItemListener(Grid<MastodonPost> grid, Div contentDiv,
-            com.vaadin.flow.data.selection.SelectionEvent<Grid<MastodonPost>, MastodonPost> event) {
+            SelectionEvent<Grid<MastodonPost>, MastodonPost> event) {
         grid.getDataProvider().fetch(new Query<>()).forEach(p -> grid.setDetailsVisible(p, false));
         event.getFirstSelectedItem().ifPresent(this::selectAndDisplay);
     }
