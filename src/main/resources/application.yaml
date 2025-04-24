@@ -1,13 +1,3 @@
-logging:
-  level:
-    root: info
-
-vaadin:
-  launch-browser: @vaadin.frontend.hotdeploy@
-  allowed-packages: 
-    - com.vaadin
-    - org.vaadin
-    - com
-  productionMode: @vaadin.production.mode@
-  frontend:
-    hotdeploy: @vaadin.frontend.hotdeploy@
+spring:
+  profiles:
+    active: dev

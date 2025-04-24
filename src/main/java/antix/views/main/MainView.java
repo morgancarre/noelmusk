@@ -1,25 +1,26 @@
 package antix.views.main;
 
+import antix.components.ApercuPost;
+import antix.factory.CommandFactory;
 import antix.model.MastodonPost;
+import antix.views.main.commands.Command;
+import antix.views.main.commands.PlayCommand;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.Query;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
+import com.vaadin.flow.data.provider.Query;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,96 +28,87 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
+import java.util.*;
 
-import com.vaadin.flow.component.UI;
-
-@PageTitle("main")
+@PageTitle("NoelMusk - Test pour la bande")
 @Route("")
 public class MainView extends VerticalLayout {
-    public MainView() {
+    private final Grid<MastodonPost> grid;
+    private final Div contentDiv;
 
-        // Désactiver la souris (curseur)
-        UI.getCurrent().getPage().executeJs("document.body.style.cursor = 'none';");
+    public MainView() {
+        var prompt = new TextField();
+        prompt.setId("prompt-field");
+        prompt.setWidth("100%");
+
+        UI.getCurrent().getPage().executeJs("""
+                    const overlay = document.createElement('div');
+                    overlay.id = 'click-blocker';
+                    overlay.style.position = 'fixed';
+                    overlay.style.top = 0;
+                    overlay.style.left = 0;
+                    overlay.style.width = '100vw';
+                    overlay.style.height = '100vh';
+                    overlay.style.zIndex = '9999';
+                    overlay.style.pointerEvents = 'all';
+                    overlay.style.backgroundColor = 'transparent';
+                    document.body.appendChild(overlay);
+
+                    setTimeout(() => {
+                        const promptField = document.querySelector('#prompt-field');
+                        if (promptField && promptField.offsetParent !== null) {
+                            const rect = promptField.getBoundingClientRect();
+                            const hole = document.createElement('div');
+                            hole.style.position = 'fixed';
+                            hole.style.left = rect.left + 'px';
+                            hole.style.top = rect.top + 'px';
+                            hole.style.width = rect.width + 'px';
+                            hole.style.height = rect.height + 'px';
+                            hole.style.pointerEvents = 'none';
+                            hole.style.zIndex = '10000';
+                            document.body.appendChild(hole);
+                            promptField.style.zIndex = '10001';
+                            promptField.style.position = 'relative';
+                            promptField.style.pointerEvents = 'auto';
+                        }
+                    }, 100);
+                """);
 
         setSizeFull();
         setAlignItems(FlexComponent.Alignment.CENTER);
-        var grid = new Grid<>(MastodonPost.class, false);
-        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
-        // Créer le composant HTML pour afficher le contenu
-        var contentDiv = new Div();
+        this.grid = new Grid<>(MastodonPost.class, false);
+        this.contentDiv = new Div();
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         contentDiv.setWidthFull();
 
-        // addLineNumberColumn(grid);
-        // addTagsColumn(grid);
-        addRepliesColumn(grid);
+        addIndexColumn(grid);
         addContentColumn(grid);
 
-        grid.setItemDetailsRenderer(new ComponentRenderer<>(post -> new Div(Jsoup.parse(post.getContent()).text())));
-        grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
-        grid.setDetailsVisibleOnClick(false);
+        List<MastodonPost> favoris = new ArrayList<>();
+        PostSelector selector = this::selectAndDisplay;
 
-        AtomicBoolean internalChange = new AtomicBoolean(false);
-        var prompt = new TextField();
-        prompt.setWidth("100%");
+        Map<String, Command> commandMap = CommandFactory.build(
+                grid,
+                contentDiv,
+                selector,
+                favoris,
+                () -> fetchPostsFromTag("info"),
+                this::fetchPostsFromTag);
+
+        PlayCommand playCmd = (PlayCommand) commandMap.get("play");
+
         prompt.addValueChangeListener(v -> {
-            if (internalChange.get()) {
-                return;
-            }
             String text = v.getValue().trim();
-            // if (text.startsWith("goto ")) {
-            // closeAll(grid);
-            // String id = text.substring(3).trim();
-            // if (!id.isEmpty()) {
-            // var post = findPostById(grid, Integer.parseInt(id));
-            // grid.setDetailsVisible(post, true);
-            // }
-            // } else
-            if (text.startsWith("hashtag ") || text.startsWith("h ")) {
-                String tag = text.substring(1).trim();
-                grid.setItems(fetchPostsFromTag(tag));
-                grid.getDataProvider().fetch(new Query<>()).findFirst().ifPresent(firstItem -> {
-                    grid.select(firstItem);
-                });
-            } else if (text.equals("next") || text.equals("n")) {
-                // Sélectionne la ligne suivante
-                MastodonPost currentSelection = grid.getSelectedItems().stream().findFirst().orElse(null);
-                List<MastodonPost> items = grid.getDataProvider().fetch(new Query<>()).collect(Collectors.toList());
-                if (currentSelection != null) {
-                    int currentIndex = items.indexOf(currentSelection);
-                    if (currentIndex < items.size() - 1) {
-                        grid.select(items.get(currentIndex + 1));
-                    }
-                } else if (!items.isEmpty()) {
-                    grid.select(items.get(0));
-                }
-            } else if (text.startsWith("goto ") || text.startsWith("g ")) {
-                try {
-                    int index = Integer.parseInt(text.substring(5).trim()) - 1;
-                    List<MastodonPost> items = grid.getDataProvider().fetch(new Query<>()).collect(Collectors.toList());
-                    if (index >= 0 && index < items.size()) {
-                        grid.select(items.get(index));
-                    }
-                } catch (NumberFormatException ignored) {
-                }
-            } else if (text.equals("previous") || text.equals("p")) {
-                // Sélectionne la ligne précédente
-                MastodonPost currentSelection = grid.getSelectedItems().stream().findFirst().orElse(null);
-                List<MastodonPost> items = grid.getDataProvider().fetch(new Query<>()).collect(Collectors.toList());
-                if (currentSelection != null) {
-                    int currentIndex = items.indexOf(currentSelection);
-                    if (currentIndex > 0) {
-                        grid.select(items.get(currentIndex - 1));
-                    }
-                }
-            }
-            internalChange.set(true);
+            if (text.isEmpty())
+                return;
+
+            playCmd.stop();
+
+            commandMap.getOrDefault(text.split(" ")[0], commandMap.get(text))
+                    .execute(text);
+
             prompt.setValue("");
-            internalChange.set(false);
         });
 
         // Créer un HorizontalLayout pour contenir la grid et le contenu
@@ -148,84 +140,32 @@ public class MainView extends VerticalLayout {
         // Ajuster les flex grow
         setFlexGrow(1, horizontalLayout);
         setFlexGrow(0, promptContainer);
+
+        grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
+
     }
 
-    private void addLineNumberColumn(Grid<MastodonPost> grid) {
-        grid.addColumn(post -> getLineNumber(post, grid))
-                .setWidth("4em")
-                .setFlexGrow(0);
-    }
-
-    private void addTagsColumn(Grid<MastodonPost> grid) {
-        grid.addColumn(new ComponentRenderer<>(post -> {
-            var tagContainer = new FlexLayout();
-            tagContainer.setFlexWrap(FlexLayout.FlexWrap.WRAP);
-            tagContainer.setAlignItems(FlexComponent.Alignment.CENTER);
-
-            if (post.getTags() != null) {
-                var tags = post.getTags();
-                var displayCount = Math.min(3, tags.size());
-
-                // Affiche les 3 premiers tags
-                for (int i = 0; i < displayCount; i++) {
-                    var badge = new Span(tags.get(i).getName());
-                    badge.getElement().getThemeList().add("badge contrast");
-                    badge.getStyle().set("margin", "2px");
-                    tagContainer.add(badge);
-                }
-
-                // Affiche le badge +X si il y a plus de 3 tags
-                if (tags.size() > 3) {
-                    var remainingCount = tags.size() - 3;
-                    var moreBadge = new Span("+" + remainingCount);
-                    moreBadge.getElement().getThemeList().add("badge");
-                    moreBadge.getStyle().set("margin", "2px");
-                    tagContainer.add(moreBadge);
-                }
-            }
-            return tagContainer;
-        })).setAutoWidth(true);
-    }
-
-    private void addRepliesColumn(Grid<MastodonPost> grid) {
-        grid.addColumn(post -> post.getRepliesCount())
-                .setAutoWidth(true);
+    private void addIndexColumn(Grid<MastodonPost> grid) {
+        grid.addColumn(post -> {
+            List<MastodonPost> items = grid.getListDataView().getItems().toList();
+            return items.indexOf(post) + 1;
+        }).setAutoWidth(true);
     }
 
     private void addContentColumn(Grid<MastodonPost> grid) {
-        grid.addColumn(p -> StringUtils.left(Jsoup.parse(p.getContent()).text(), 150))
-                .setAutoWidth(true);
-    }
-
-    private int getLineNumber(MastodonPost post, Grid<MastodonPost> grid) {
-        List<MastodonPost> currentItems = grid.getDataProvider()
-                .fetch(new Query<>())
-                .toList();
-        return currentItems.indexOf(post) + 1;
-    }
-
-    private void closeAll(Grid<MastodonPost> grid) {
-        grid.getDataProvider().fetch(new Query<>())
-                .forEach(post -> grid.setDetailsVisible(post, false));
-    }
-
-    private MastodonPost findPostById(Grid<MastodonPost> grid, int id) {
-        List<MastodonPost> items = grid.getDataProvider().fetch(new Query<>())
-                .toList();
-
-        if (id >= 0 && id < items.size()) {
-            return items.get(id - 1);
-        }
-        return null;
+        grid.addComponentColumn(post -> {
+            ApercuPost apercuPost = new ApercuPost(post);
+            return apercuPost;
+        }).setAutoWidth(true);
     }
 
     public List<MastodonPost> fetchPostsFromTag(String tag) {
         if (StringUtils.isEmpty(tag))
             return List.of();
-        try {
 
+        try {
             var uri = new URIBuilder("https://mastodon.social/api/v1/timelines/tag/" + tag)
-                    .addParameter("limit", "10")
+                    .addParameter("limit", "40")
                     .build();
 
             URL url = uri.toURL();
@@ -239,102 +179,32 @@ public class MainView extends VerticalLayout {
                 response.append(line);
             }
             reader.close();
+
             ObjectMapper mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
-
-            return Arrays.stream(mapper.readValue(response.toString(), MastodonPost[].class))
-                    .collect(Collectors.toList());
+            return Arrays.stream(mapper.readValue(response.toString(), MastodonPost[].class)).toList();
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void selectItemListener(Grid<MastodonPost> grid, Div contentDiv,
-            SelectionEvent<Grid<MastodonPost>, MastodonPost> event) {
-        // Ferme tous les détails
-        closeAll(grid);
-        // Met à jour le contenu HTML et expande la ligne sélectionnée
-        event.getFirstSelectedItem().ifPresent(post -> {
-            // Créer un conteneur vertical pour le contenu et les réponses
-            VerticalLayout container = new VerticalLayout();
+            com.vaadin.flow.data.selection.SelectionEvent<Grid<MastodonPost>, MastodonPost> event) {
+        grid.getDataProvider().fetch(new Query<>()).forEach(p -> grid.setDetailsVisible(p, false));
+        event.getFirstSelectedItem().ifPresent(this::selectAndDisplay);
+    }
 
-            // Ajouter le contenu du post
+    public void selectAndDisplay(MastodonPost post) {
+        grid.select(post);
+        contentDiv.removeAll();
+
+        if (post != null) {
+            VerticalLayout container = new VerticalLayout();
             Div postContent = new Div();
             postContent.getElement().setProperty("innerHTML", post.getContent());
             container.add(postContent);
-
-            // Ajouter les réponses si elles existent
-            if (post.getRepliesCount() > 0) {
-                Div repliesHeader = new Div();
-                repliesHeader.setText("Réponses (" + post.getRepliesCount() + ")");
-                // Récupérer les réponses via l'API
-                try {
-                    var uri = new URIBuilder("https://mastodon.social/api/v1/statuses/" + post.getId() + "/context")
-                            .build();
-
-                    // Afficher l'URI pour pouvoir cliquer dessus
-                    Div uriDiv = new Div();
-                    uriDiv.setText(uri.toString());
-                    uriDiv.getStyle().set("color", "var(--lumo-primary-color)");
-                    uriDiv.getStyle().set("cursor", "pointer");
-                    container.add(uriDiv);
-                    // Afficher le lien du post
-                    Div postLinkDiv = new Div();
-                    String postUrl = "https://mastodon.social/@" + post.getAccount().getUsername() + "/" + post.getId();
-                    postLinkDiv.setText(postUrl);
-                    postLinkDiv.getStyle().set("color", "var(--lumo-primary-color)");
-                    postLinkDiv.getStyle().set("cursor", "pointer");
-                    postLinkDiv.getStyle().set("margin-bottom", "1em");
-                    container.add(postLinkDiv);
-
-                    URL url = uri.toURL();
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    con.setRequestMethod("GET");
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-                    reader.close();
-
-                    ObjectMapper mapper = new ObjectMapper();
-                    mapper.registerModule(new JavaTimeModule());
-                    var context = mapper.readTree(response.toString());
-                    var descendants = context.get("descendants");
-
-                    // Créer un conteneur pour les réponses
-                    VerticalLayout repliesContainer = new VerticalLayout();
-                    repliesContainer.setSpacing(true);
-                    repliesContainer.setPadding(true);
-                    repliesContainer.getStyle().set("background", "var(--lumo-contrast-5pct)");
-                    repliesContainer.getStyle().set("border-radius", "var(--lumo-border-radius-m)");
-
-                    // Ajouter chaque réponse
-                    for (var reply : descendants) {
-                        Div replyDiv = new Div();
-                        replyDiv.getElement().setProperty("innerHTML", reply.get("content").asText());
-                        replyDiv.getStyle().set("margin-bottom", "0.5em");
-                        repliesContainer.add(replyDiv);
-                    }
-
-                    container.add(repliesContainer);
-                } catch (IOException | URISyntaxException e) {
-                    Div errorDiv = new Div();
-                    errorDiv.setText("Erreur lors de la récupération des réponses: " + e.getMessage());
-                    errorDiv.getStyle().set("color", "var(--lumo-error-text-color)");
-                    container.add(errorDiv);
-                }
-                repliesHeader.getStyle().set("margin-top", "1em");
-                repliesHeader.getStyle().set("font-weight", "bold");
-                container.add(repliesHeader);
-            }
-
-            // Remplacer le contenu du contentDiv
-            contentDiv.removeAll();
             contentDiv.add(container);
-
             grid.setDetailsVisible(post, true);
-        });
+        }
     }
-}
+};

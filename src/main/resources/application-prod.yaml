@@ -1,0 +1,16 @@
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+logging:
+  level:
+    root: warn
+
+vaadin:
+  productionMode: true
+  launch-browser: false
+  frontend:
+    hotdeploy: false
