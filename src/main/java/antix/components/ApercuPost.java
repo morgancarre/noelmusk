@@ -28,7 +28,7 @@ public class ApercuPost extends Div {
         Span userTag = new Span("@" + username);  // Affiche le @username
         userTag.addClassName("user-tag");
         userTag.getStyle().set("font-size", "small"); // Style pour afficher le tag en petit texte
-        userTag.getStyle().set("color", "#888"); // Couleur plus claire pour le tag
+        userTag.getStyle().set("color", "#FFF"); // Couleur plus claire pour le tag
 
         // Appliquer les styles pour limiter la taille du titre
         authorName.getStyle().set("white-space", "nowrap");  // Empêche le texte de se diviser en plusieurs lignes
@@ -55,7 +55,7 @@ public class ApercuPost extends Div {
         Span postDate = new Span("Posted on: " + formattedDate);
         postDate.addClassName("post-date");
         postDate.getStyle().set("font-size", "small"); // Style pour afficher la date en petit texte
-        postDate.getStyle().set("color", "#888"); // Couleur plus claire pour la date
+        postDate.getStyle().set("color", "#FFF"); // Couleur plus claire pour la date
 
         // Layout horizontal pour aligner l'auteur (nom et @)
         HorizontalLayout authorLayout = new HorizontalLayout(authorName, userTag);
