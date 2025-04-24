@@ -34,5 +34,20 @@ tr:nth-child(even) {
   background-color: #2a2a2a; /* Couleur de fond pour les lignes paires */
 }
 
+.apercu-post {
+  background-color: #6e6e6e;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  width: 300px;
+}
+
+
+.apercu-post .post-content {
+  color: #ffffff;
+  margin-top: 10px;
+  font-size: 14px;
+}
 
 

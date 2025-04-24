@@ -1,5 +1,6 @@
 package antix.views.main;
 
+import antix.components.ApercuPost;
 import antix.factory.CommandFactory;
 import antix.model.MastodonPost;
 import antix.views.main.commands.Command;
@@ -152,7 +153,10 @@ public class MainView extends VerticalLayout {
     }
 
     private void addContentColumn(Grid<MastodonPost> grid) {
-        grid.addColumn(p -> StringUtils.left(Jsoup.parse(p.getContent()).text(), 150)).setAutoWidth(true);
+        grid.addComponentColumn(post -> {
+            ApercuPost apercuPost = new ApercuPost(post);
+            return apercuPost;
+        }).setAutoWidth(true);
     }
 
     public List<MastodonPost> fetchPostsFromTag(String tag) {
