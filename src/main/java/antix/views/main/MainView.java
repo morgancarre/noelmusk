@@ -35,6 +35,8 @@ import java.util.*;
 public class MainView extends VerticalLayout {
     private final Grid<MastodonPost> grid;
     private final Div contentDiv;
+    private final List<String> commandesTapees = new ArrayList<>();
+
 
     public MainView() {
         var prompt = new TextField();
@@ -94,7 +96,8 @@ public class MainView extends VerticalLayout {
                 selector,
                 favoris,
                 () -> fetchPostsFromTag("info"),
-                this::fetchPostsFromTag);
+                this::fetchPostsFromTag,
+                commandesTapees);
 
         PlayCommand playCmd = (PlayCommand) commandMap.get("play");
 
@@ -104,9 +107,11 @@ public class MainView extends VerticalLayout {
                 return;
 
             playCmd.stop();
+            //récupère les commande pour l'historique      
+            commandesTapees.add(text);
 
             commandMap.getOrDefault(text.split(" ")[0], commandMap.get(text))
-                    .execute(text);
+                    .execute(text);    
 
             prompt.setValue("");
         });
