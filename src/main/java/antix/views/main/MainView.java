@@ -5,7 +5,8 @@ import antix.factory.CommandFactory;
 import antix.model.MastodonPost;
 import antix.views.main.commands.Command;
 import antix.views.main.commands.PlayCommand;
-
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vaadin.flow.component.UI;
@@ -100,19 +101,24 @@ public class MainView extends VerticalLayout {
                 commandesTapees);
 
         PlayCommand playCmd = (PlayCommand) commandMap.get("play");
-
+        
         prompt.addValueChangeListener(v -> {
             String text = v.getValue().trim();
             if (text.isEmpty())
                 return;
 
             playCmd.stop();
-            //récupère les commande pour l'historique      
             commandesTapees.add(text);
 
-            commandMap.getOrDefault(text.split(" ")[0], commandMap.get(text))
-                    .execute(text);    
+            String commandKey = text.split(" ")[0];
+            Command command = commandMap.getOrDefault(commandKey, null);
 
+            if (command != null) {
+                command.execute(text);
+            } else {
+                Notification notification = Notification.show("Commande inconnue : \"" + commandKey + "\"", 1000, Notification.Position.TOP_END);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
             prompt.setValue("");
         });
 
