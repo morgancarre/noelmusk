@@ -20,6 +20,7 @@ import com.vaadin.flow.router.Route;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
+import com.vaadin.flow.data.provider.Query;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,14 +34,13 @@ import java.util.*;
 @Route("")
 public class MainView extends VerticalLayout {
     private final Grid<MastodonPost> grid;
-    private final Div previewDiv;
     private final Div contentDiv;
 
     public MainView() {
         var prompt = new TextField();
         prompt.setId("prompt-field");
         prompt.setWidth("100%");
-        
+
         UI.getCurrent().getPage().executeJs("""
                     const overlay = document.createElement('div');
                     overlay.id = 'click-blocker';
@@ -78,8 +78,6 @@ public class MainView extends VerticalLayout {
         setAlignItems(FlexComponent.Alignment.CENTER);
 
         this.grid = new Grid<>(MastodonPost.class, false);
-        this.previewDiv = new Div();
-        previewDiv.add(grid);
         this.contentDiv = new Div();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         contentDiv.setWidthFull();
@@ -143,6 +141,8 @@ public class MainView extends VerticalLayout {
         setFlexGrow(1, horizontalLayout);
         setFlexGrow(0, promptContainer);
 
+        grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
+
     }
 
     private void addIndexColumn(Grid<MastodonPost> grid) {
@@ -186,6 +186,12 @@ public class MainView extends VerticalLayout {
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void selectItemListener(Grid<MastodonPost> grid, Div contentDiv,
+            com.vaadin.flow.data.selection.SelectionEvent<Grid<MastodonPost>, MastodonPost> event) {
+        grid.getDataProvider().fetch(new Query<>()).forEach(p -> grid.setDetailsVisible(p, false));
+        event.getFirstSelectedItem().ifPresent(this::selectAndDisplay);
     }
 
     public void selectAndDisplay(MastodonPost post) {
