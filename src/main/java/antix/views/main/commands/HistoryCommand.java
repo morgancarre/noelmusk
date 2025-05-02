@@ -27,7 +27,7 @@ public class HistoryCommand extends Command {
                           PostSelector selector,
                           List<String> history,
                           Div contentDiv) {
-        super(List.of("hist", "history", "histo"), "Historique",
+        super(List.of("hist", "histo"), "Historique",
                 "hist : affiche l’historique des commandes saisies.\n" +
                 "hist <mot> : recherche les commandes contenant <mot>.");
         this.grid = grid;
