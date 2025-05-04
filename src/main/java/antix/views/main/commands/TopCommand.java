@@ -18,7 +18,17 @@ public class TopCommand extends NavigationCommand {
      * @param selector Le sélecteur responsable de l'affichage du post choisi.
      */
     public TopCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super(List.of("top"), "Top", "top : sélectionne le post le plus haut de la page", grid, selector);
+        super(
+            List.of("top"),
+            "Top",
+            """
+            ⬆️ top
+            
+            💡 Sélectionne le post le plus haut de la page
+            """,
+            grid,
+            selector
+        );
     }
 
     /**

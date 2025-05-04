@@ -17,7 +17,17 @@ public class BottomCommand extends NavigationCommand {
      * @param selector Interface permettant d'afficher un post dans l'UI.
      */
     public BottomCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super(List.of("bottom"), "Bottom", "bottom : sélectionne le dernier post de la page", grid, selector);
+        super(
+            List.of("bottom"),
+            "Bottom",
+            """
+            ⬇️ bottom
+    
+            💡 Sélectionne le post le plus bas de la page
+            """,
+            grid,
+            selector
+        );
     }
 
     /**

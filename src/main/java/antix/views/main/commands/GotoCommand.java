@@ -25,7 +25,15 @@ public class GotoCommand extends Command {
      * @param selector    Sélecteur de post pour affichage.
      */
     public GotoCommand(Grid<MastodonPost> grid, PostSelector selector) {
-        super(List.of("g", "goto"),"Goto", "Aller au post numéro n");
+        super(
+            List.of("g", "goto"),
+            "Goto",
+            """
+            ⬇️ g / goto <numéro>
+        
+            💡 Va directement au post numéro n
+            """
+        );
         this.grid = grid;
         this.selector = selector;
     }

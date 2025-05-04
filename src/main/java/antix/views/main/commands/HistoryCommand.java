@@ -27,9 +27,17 @@ public class HistoryCommand extends Command {
                           PostSelector selector,
                           List<String> history,
                           Div contentDiv) {
-        super(List.of("hist", "histo"), "Historique",
-                "hist : affiche l’historique des commandes saisies.\n" +
-                "hist <mot> : recherche les commandes contenant <mot>.");
+        super(
+            List.of("hist", "histo"),
+            "Historique",
+            """
+            📜 hist / histo <mot-clé?>
+    
+            💡 Affiche l’historique des commandes saisies :
+                • 📜 hist : affiche l’historique complet des commandes
+                • 🔍 hist <mot-clé> : recherche dans l’historique les commandes contenant le mot-clé spécifié
+            """
+        );
         this.grid = grid;
         this.selector = selector;
         this.history = history;
@@ -58,11 +66,5 @@ public class HistoryCommand extends Command {
         }
 
         contentDiv.add(historyDiv);
-    }
-
-    @Override
-    public String getDescription() {
-        return "hist : affiche l’historique des commandes saisies.\n" +
-               "hist <mot> : recherche les commandes contenant <mot>.";
     }
 }

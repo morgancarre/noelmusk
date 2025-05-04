@@ -28,15 +28,14 @@ public class SortCommand extends Command {
                 List.of("sort"),
                 "Sort",
                 """
-                        📊 sort <replies | reposts | likes>
+                📊 sort <replies | reposts | likes>
 
-                        🔹 Trie les posts par ordre décroissant selon le critère choisi :
-                            • 🗨️ replies : nombre de réponses
-                            • 🔁 reposts : nombre de repartages
-                            • ❤️ likes : nombre de likes
-
-                        ✅ Le post en tête de liste est automatiquement sélectionné et affiché.
-                        """);
+                💡 Trie les posts par ordre décroissant selon le critère choisi :
+                    • 🗨️ replies : nombre de réponses
+                    • 🔁 reposts : nombre de repartages
+                    • ❤️ likes : nombre de likes
+                """
+        );
         this.grid = grid;
         this.selector = selector;
     }
