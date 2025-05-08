@@ -193,7 +193,6 @@ private void addPostInfoColumn(Grid<MastodonPost> grid) {
         grid.addComponentColumn(post -> {
             Div container = new Div();
             container.addClassName("post-info-row");
-            container.setMaxWidth("800px");
             container.setWidthFull();
 
             Span authorName = new Span(post.getAccount().getDisplayName());
@@ -226,6 +225,8 @@ private void addPostInfoColumn(Grid<MastodonPost> grid) {
             postLayout.setSpacing(false);
             postLayout.setPadding(false);
             postLayout.setWidthFull();
+            postLayout.setWidth("auto");
+            postLayout.setMaxWidth("800px");
 
             container.add(postLayout);
             return container;
