@@ -1,6 +1,5 @@
 package antix.views.main;
 
-import antix.components.ApercuPost;
 import antix.factory.CommandFactory;
 import antix.model.MastodonPost;
 import antix.views.main.commands.Command;
@@ -12,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @PageTitle("NoelMusk - Test pour la bande")
@@ -100,16 +101,16 @@ backgroundWaves.addClassName("background-waves");
 
 getElement().insertChild(0, backgroundWaves.getElement());
 
-        this.grid = new Grid<>(MastodonPost.class, false);
+        this.grid = new Grid<>(MastodonPost.class);
         this.grid.addClassName("custom-grid");
-        
-        
-        this.contentDiv = new Div();
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.setColumns(); // Supprime toutes les colonnes par défaut
+
+        this.contentDiv = new Div();
         contentDiv.setWidthFull();
 
         addIndexColumn(grid);
-        addContentColumn(grid);
+        addPostInfoColumn(grid); // Nouvelle méthode pour afficher toutes les infos dans une seule colonne
 
         List<MastodonPost> favoris = new ArrayList<>();
         PostSelector selector = this::selectAndDisplay;
@@ -188,10 +189,46 @@ getElement().insertChild(0, backgroundWaves.getElement());
         }).setAutoWidth(true);
     }
 
-    private void addContentColumn(Grid<MastodonPost> grid) {
+private void addPostInfoColumn(Grid<MastodonPost> grid) {
         grid.addComponentColumn(post -> {
-            ApercuPost apercuPost = new ApercuPost(post);
-            return apercuPost;
+            Div container = new Div();
+            container.addClassName("post-info-row");
+            container.setMaxWidth("800px");
+            container.setWidthFull();
+
+            Span authorName = new Span(post.getAccount().getDisplayName());
+            authorName.addClassName("author-name");
+            authorName.getStyle().set("font-weight", "bold").set("margin-right", "0.5em");
+
+            Span username = new Span("@" + post.getAccount().getUsername());
+            username.addClassName("username");
+            username.getStyle().setColor("gray").setFontSize("small").set("margin-right", "1em");
+
+            Div contentPreview = new Div();
+            String textContent = Jsoup.parse(post.getContent()).text();
+            String previewText = textContent.length() > 150 ? textContent.substring(0, 150) + "..." : textContent;
+            contentPreview.setText(previewText);
+            contentPreview.addClassName("post-content");
+            contentPreview.setWidthFull();
+            contentPreview.getStyle().set("white-space", "normal").set("word-break", "break-word");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            String formattedDate = post.getCreatedAt().format(formatter);
+            Span dateSpan = new Span(formattedDate);
+            dateSpan.addClassName("post-date");
+            dateSpan.getStyle().setColor("gray").setFontSize("small");
+
+            HorizontalLayout header = new HorizontalLayout(authorName, username, dateSpan);
+            header.setAlignItems(FlexComponent.Alignment.BASELINE);
+            header.setWidthFull();
+
+            VerticalLayout postLayout = new VerticalLayout(header, contentPreview);
+            postLayout.setSpacing(false);
+            postLayout.setPadding(false);
+            postLayout.setWidthFull();
+
+            container.add(postLayout);
+            return container;
         }).setAutoWidth(true);
     }
 
