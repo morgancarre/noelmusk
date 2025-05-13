@@ -186,7 +186,7 @@ getElement().insertChild(0, backgroundWaves.getElement());
         grid.addColumn(post -> {
             List<MastodonPost> items = grid.getListDataView().getItems().toList();
             return items.indexOf(post) + 1;
-        }).setAutoWidth(true);
+        }).setWidth("50px");
     }
 
 private void addPostInfoColumn(Grid<MastodonPost> grid) {
@@ -232,6 +232,7 @@ private void addPostInfoColumn(Grid<MastodonPost> grid) {
             return container;
         }).setAutoWidth(true);
         grid.removeAllHeaderRows();
+        
     }
 
     public List<MastodonPost> fetchPostsFromTag(String tag) {
