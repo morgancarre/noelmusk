@@ -231,6 +231,7 @@ private void addPostInfoColumn(Grid<MastodonPost> grid) {
             container.add(postLayout);
             return container;
         }).setAutoWidth(true);
+        grid.removeAllHeaderRows();
     }
 
     public List<MastodonPost> fetchPostsFromTag(String tag) {
