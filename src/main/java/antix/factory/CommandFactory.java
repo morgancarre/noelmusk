@@ -40,7 +40,7 @@ public class CommandFactory {
         Map<String, Command> commands = new LinkedHashMap<>();
 
         addCommands(new ResetCommand(grid, resetFetcher, selector), commands);
-        addCommands(new RepliesGreaterCommand(grid, selector), commands);
+        addCommands(new FilterCommand(grid, selector), commands);
         addCommands(new SelectByIdCommand(grid, selector), commands);
         addCommands(new ContentSearchCommand(grid, selector), commands);
         addCommands(new HashtagCommand(grid, tagFetcher, selector), commands);
