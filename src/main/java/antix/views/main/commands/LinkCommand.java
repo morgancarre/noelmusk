@@ -1,6 +1,6 @@
 package antix.views.main.commands;
 
-import antix.model.MastodonPost;
+import antix.model.SocialMediaPost;
 import antix.utils.FeedbackUtils;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import com.vaadin.flow.component.textfield.TextField;
  * Le lien est automatiquement copié dans le presse-papiers.
  */
 public class LinkCommand extends Command {
-    private final Grid<MastodonPost> grid;
+    private final Grid<SocialMediaPost> grid;
     private final Div contentDiv;
 
     /**
@@ -23,7 +23,7 @@ public class LinkCommand extends Command {
      * @param grid        Grille des posts.
      * @param contentDiv  Zone d'affichage secondaire (feedback lien).
      */
-    public LinkCommand(Grid<MastodonPost> grid, Div contentDiv) {
+    public LinkCommand(Grid<SocialMediaPost> grid, Div contentDiv) {
         super(
             List.of("l", "link"),
             "Link",
@@ -45,7 +45,7 @@ public class LinkCommand extends Command {
     @Override
     public void execute(String input) {
         contentDiv.removeAll();
-        MastodonPost post = grid.getSelectedItems().stream().findFirst().orElse(null);
+        SocialMediaPost post = grid.getSelectedItems().stream().findFirst().orElse(null);
 
         if (post != null) {
             String url = post.getUrl();

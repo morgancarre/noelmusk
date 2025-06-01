@@ -1,6 +1,6 @@
 package antix.views.main.commands;
 
-import antix.model.MastodonPost;
+import antix.model.SocialMediaPost;
 import antix.utils.FeedbackUtils;
 import antix.utils.GridUtils;
 import antix.views.main.PostSelector;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Exemple : \"replies > 10\" ou \"r > 5\"
  */
 public class RepliesGreaterCommand extends Command {
-    private final Grid<MastodonPost> grid;
+    private final Grid<SocialMediaPost> grid;
     private final PostSelector selector;
 
     /**
@@ -24,7 +24,7 @@ public class RepliesGreaterCommand extends Command {
      * @param grid        Grille contenant les posts.
      * @param selector    Interface de sélection du post à afficher.
      */
-    public RepliesGreaterCommand(Grid<MastodonPost> grid, PostSelector selector) {
+    public RepliesGreaterCommand(Grid<SocialMediaPost> grid, PostSelector selector) {
         super(
             List.of("r", "replies"),
             "Replies Greater",
@@ -66,7 +66,7 @@ public class RepliesGreaterCommand extends Command {
             return;
         }
 
-        List<MastodonPost> filtered = GridUtils.fetchAll(grid).stream()
+        List<SocialMediaPost> filtered = GridUtils.fetchAll(grid).stream()
                 .filter(post -> post.getRepliesCount() > min)
                 .collect(Collectors.toList());
 
