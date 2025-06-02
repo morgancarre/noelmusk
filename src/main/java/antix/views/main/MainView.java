@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import antix.utils.OnboardingOverlayUtil;
 
 @PageTitle("NoelMusk - Test pour la bande")
 @Route("")
@@ -39,12 +40,14 @@ public class MainView extends VerticalLayout {
     
     private final RedditService redditService = new RedditService();
     private final MastodonService mastodonService = new MastodonService(); 
+
+    private final Div promptHelpBubble = new Div();
     
     public MainView() {
         var prompt = new TextField();
         prompt.setId("prompt-field");
         prompt.setWidth("100%");
-        
+
         // Code JavaScript existant...
         UI.getCurrent().getPage().executeJs("""
                     const overlay = document.createElement('div');
@@ -81,7 +84,7 @@ public class MainView extends VerticalLayout {
 
         setSizeFull();
         setAlignItems(FlexComponent.Alignment.CENTER);
-        
+
         // Code des vagues existant...
         Div backgroundWaves = new Div();
         backgroundWaves.getElement().setProperty("innerHTML", """
@@ -118,7 +121,7 @@ public class MainView extends VerticalLayout {
         GridUtils.addPostInfoColumn(grid);
 
         List<SocialMediaPost> favoris = new ArrayList<>();
-        
+
         PostSelector selector = this::selectAndDisplay;
 
         Supplier<List<SocialMediaPost>> defaultSupplier = () -> this.fetchPostsFromTag("programming");
@@ -133,7 +136,7 @@ public class MainView extends VerticalLayout {
                 commandesTapees);
 
         PlayCommand playCmd = (PlayCommand) commandMap.get("play");
-        
+
         prompt.addValueChangeListener(v -> {
             String text = v.getValue().trim();
             if (text.isEmpty())
@@ -154,6 +157,28 @@ public class MainView extends VerticalLayout {
             prompt.setValue("");
         });
 
+        // --- Onboarding overlay : bulle de bienvenue ---
+        StringBuilder commandsJsArray = new StringBuilder();
+        Set<String> seenDescriptionsJs = new HashSet<>();
+        for (Command cmd : commandMap.values()) {
+            String desc = cmd.getDescription()
+            .replace("\\", "\\\\")
+            .replace("`", "\\`")
+            .replace("'", "\\'")
+            .replace("\"", "\\\"");
+            String alias = cmd.getAliases().get(0)
+            .replace("\\", "\\\\")
+            .replace("'", "\\'")
+            .replace("\"", "\\\"");
+            if (seenDescriptionsJs.add(desc)) {
+            if (commandsJsArray.length() > 0) commandsJsArray.append(",\n");
+            commandsJsArray.append("{alias: '").append(alias).append("', desc: `").append(desc).append("`}");
+            }
+        }
+
+        String onboardingJs = OnboardingOverlayUtil.buildOnboardingJs(commandMap.values());
+        UI.getCurrent().getPage().executeJs(onboardingJs);
+
         // Reste du layout existant...
         var horizontalLayout = new HorizontalLayout();
         horizontalLayout.setSizeFull();
@@ -170,6 +195,9 @@ public class MainView extends VerticalLayout {
 
         add(horizontalLayout);
 
+        // --- Suppression de la bulle d'aide au-dessus du prompt ---
+
+        // Ajout du prompt seul dans le container
         var promptContainer = new VerticalLayout(prompt);
         promptContainer.setWidth("100%");
         promptContainer.setPadding(false);
@@ -179,6 +207,9 @@ public class MainView extends VerticalLayout {
 
         setFlexGrow(1, horizontalLayout);
         setFlexGrow(0, promptContainer);
+
+        // Rends le fond du site plus foncé
+        getElement().getStyle().set("background", "#23243a");
 
         grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
     }
