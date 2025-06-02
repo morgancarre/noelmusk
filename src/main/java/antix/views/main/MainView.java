@@ -22,6 +22,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.apache.commons.lang3.StringUtils;
 import com.vaadin.flow.data.provider.Query;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.KeyDownEvent;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -38,13 +42,54 @@ public class MainView extends VerticalLayout {
     private final Div contentDiv;
     private final List<String> commandesTapees = new ArrayList<>();
     
+    // ✅ Nouveaux attributs pour la navigation dans l'historique
+    private int historyIndex = -1;
+    private String currentInput = "";
+    private TextField prompt; // Référence au champ de commande
+    private boolean isNavigatingHistory = false; // Flag pour désactiver le listener
+    private Map<String, Command> commandMap; // Référence aux commandes
+    private PlayCommand playCmd; // Référence au PlayCommand
+    
     private final RedditService redditService = new RedditService();
     private final MastodonService mastodonService = new MastodonService(); 
     
     public MainView() {
-        var prompt = new TextField();
+        // ✅ Initialisation du TextField
+        this.prompt = new TextField();
         prompt.setId("prompt-field");
         prompt.setWidth("100%");
+        
+        // ✅ Ajout du gestionnaire pour les flèches avec JavaScript
+        prompt.addKeyDownListener(this::handleKeyDown);
+        
+        // ✅ Ajout du gestionnaire pour Enter (exécution directe)
+        prompt.addKeyPressListener(Key.ENTER, event -> {
+            String command = prompt.getValue().trim();
+            if (!command.isEmpty()) {
+                System.out.println("🎯 Exécution via Enter: '" + command + "'");
+                executeCommand(command);
+            }
+        });
+        
+        // Ajout d'un gestionnaire JavaScript pour empêcher le comportement par défaut des flèches
+        prompt.getElement().addEventListener("keydown", event -> {
+            // Ce code sera exécuté côté serveur, mais on peut ajouter du JS côté client
+        });
+        
+        // JavaScript pour gérer les flèches côté client
+        prompt.getElement().executeJs("""
+            this.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    // Laisser Vaadin gérer l'événement côté serveur
+                    // mais empêcher le déplacement du curseur
+                    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                        setTimeout(() => {
+                            this.setSelectionRange(this.value.length, this.value.length);
+                        }, 0);
+                    }
+                }
+            });
+        """);
         
         // Code JavaScript existant...
         UI.getCurrent().getPage().executeJs("""
@@ -124,6 +169,7 @@ public class MainView extends VerticalLayout {
 
         Supplier<List<SocialMediaPost>> defaultSupplier = () -> this.fetchPostsFromTag("programming");
 
+        // ✅ Mise à jour pour passer la référence à l'historique
         Map<String, Command> commandMap = CommandFactory.build(
                 grid,
                 contentDiv,
@@ -131,17 +177,30 @@ public class MainView extends VerticalLayout {
                 favoris,
                 defaultSupplier,
                 this::fetchPostsFromTag,
-                commandesTapees);
+                commandesTapees); // Utilise la même liste pour l'historique
 
         PlayCommand playCmd = (PlayCommand) commandMap.get("play");
         
+        // ✅ Stockage des références pour executeCommand
+        this.commandMap = commandMap;
+        this.playCmd = playCmd;
+        
+        // ✅ Gestionnaire d'événements modifié pour utiliser l'historique
         prompt.addValueChangeListener(v -> {
+            // ✅ Ignorer si on navigue dans l'historique
+            if (isNavigatingHistory) {
+                System.out.println("🚫 Navigation en cours - Événement ignoré");
+                return;
+            }
+            
             String text = v.getValue().trim();
             if (text.isEmpty())
                 return;
 
             playCmd.stop();
-            commandesTapees.add(text);
+            
+            // ✅ Ajouter à l'historique avec la nouvelle méthode
+            addToHistory(text);
 
             String commandKey = text.split(" ")[0];
             Command command = commandMap.getOrDefault(commandKey, null);
@@ -183,7 +242,167 @@ public class MainView extends VerticalLayout {
         grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
     }
 
-    // Méthodes existantes restent identiques...
+    // ✅ Nouvelles méthodes pour la navigation dans l'historique
+    
+    // Méthode pour gérer les touches flèches
+    private void handleKeyDown(KeyDownEvent event) {
+        System.out.println("🔍 Touche détectée: " + event.getKey());
+        System.out.println("📚 Historique actuel: " + commandesTapees.size() + " commandes");
+        System.out.println("📍 Index actuel: " + historyIndex);
+        
+        // ✅ Correction: utiliser toString() ou comparaison directe
+        String keyPressed = event.getKey().toString();
+        
+        if ("ArrowUp".equals(keyPressed)) {
+            System.out.println("⬆️ Flèche du haut détectée - Navigation UP");
+            navigateHistoryUp();
+        } else if ("ArrowDown".equals(keyPressed)) {
+            System.out.println("⬇️ Flèche du bas détectée - Navigation DOWN");
+            navigateHistoryDown();
+        } else if ("ArrowRight".equals(keyPressed)) {
+            System.out.println("➡️ Flèche droite détectée - Commande NEXT");
+            executeCommand("n");
+        } else if ("ArrowLeft".equals(keyPressed)) {
+            System.out.println("⬅️ Flèche gauche détectée - Commande PREVIOUS");
+            executeCommand("p");
+        } else {
+            // Si l'utilisateur tape autre chose, réinitialiser l'index
+            if (!isNavigationKey(event.getKey())) {
+                historyIndex = commandesTapees.size();
+            }
+        }
+    }
+    
+    // Vérifier si c'est une touche de navigation (à ignorer pour la réinitialisation)
+    private boolean isNavigationKey(Key key) {
+        String keyPressed = key.toString();
+        return "ArrowUp".equals(keyPressed) || "ArrowDown".equals(keyPressed) || 
+               "ArrowLeft".equals(keyPressed) || "ArrowRight".equals(keyPressed) ||
+               "Shift".equals(keyPressed) || "Control".equals(keyPressed) || "Alt".equals(keyPressed) ||
+               "Home".equals(keyPressed) || "End".equals(keyPressed);
+    }
+    
+    // Ajouter une commande à l'historique
+    public void addToHistory(String command) {
+        if (!command.trim().isEmpty()) {
+            // Éviter les doublons consécutifs
+            if (commandesTapees.isEmpty() || !commandesTapees.get(commandesTapees.size() - 1).equals(command)) {
+                commandesTapees.add(command);
+            }
+        }
+        // Réinitialiser l'index après ajout
+        historyIndex = commandesTapees.size();
+        currentInput = "";
+    }
+    
+    // Navigation vers le haut dans l'historique (commandes plus anciennes)
+    private void navigateHistoryUp() {
+        System.out.println("🔄 Navigation UP - Historique: " + commandesTapees.size() + " éléments");
+        
+        if (commandesTapees.isEmpty()) {
+            System.out.println("❌ Historique vide");
+            return;
+        }
+        
+        // Sauvegarder la saisie actuelle si on est à la fin
+        if (historyIndex == commandesTapees.size()) {
+            currentInput = prompt.getValue();
+            System.out.println("💾 Sauvegarde input actuel: '" + currentInput + "'");
+        }
+        
+        if (historyIndex > 0) {
+            historyIndex--;
+            String command = commandesTapees.get(historyIndex);
+            System.out.println("✅ Navigation vers: '" + command + "' (index " + historyIndex + ")");
+            
+            // ✅ Désactiver temporairement le listener
+            isNavigatingHistory = true;
+            prompt.setValue(command);
+            isNavigatingHistory = false;
+            
+            // Placer le curseur à la fin
+            prompt.getElement().executeJs("this.setSelectionRange(this.value.length, this.value.length)");
+        } else if (historyIndex == 0) {
+            // Déjà à la première commande, rester dessus
+            String command = commandesTapees.get(0);
+            System.out.println("🔄 Reste sur première commande: '" + command + "'");
+            
+            // ✅ Désactiver temporairement le listener
+            isNavigatingHistory = true;
+            prompt.setValue(command);
+            isNavigatingHistory = false;
+            
+            prompt.getElement().executeJs("this.setSelectionRange(this.value.length, this.value.length)");
+        } else {
+            // Premier accès à l'historique
+            historyIndex = commandesTapees.size() - 1;
+            if (historyIndex >= 0) {
+                String command = commandesTapees.get(historyIndex);
+                System.out.println("🎯 Premier accès à l'historique: '" + command + "' (index " + historyIndex + ")");
+                
+                // ✅ Désactiver temporairement le listener
+                isNavigatingHistory = true;
+                prompt.setValue(command);
+                isNavigatingHistory = false;
+                
+                prompt.getElement().executeJs("this.setSelectionRange(this.value.length, this.value.length)");
+            }
+        }
+    }
+    
+    // Navigation vers le bas dans l'historique (commandes plus récentes)
+    private void navigateHistoryDown() {
+        System.out.println("🔄 Navigation DOWN - Historique: " + commandesTapees.size() + " éléments");
+        
+        if (commandesTapees.isEmpty() || historyIndex < 0) {
+            System.out.println("❌ Historique vide ou index invalide");
+            return;
+        }
+        
+        if (historyIndex < commandesTapees.size() - 1) {
+            historyIndex++;
+            String command = commandesTapees.get(historyIndex);
+            System.out.println("✅ Navigation vers: '" + command + "' (index " + historyIndex + ")");
+            
+            // ✅ Désactiver temporairement le listener
+            isNavigatingHistory = true;
+            prompt.setValue(command);
+            isNavigatingHistory = false;
+            
+            prompt.getElement().executeJs("this.setSelectionRange(this.value.length, this.value.length)");
+        } else if (historyIndex == commandesTapees.size() - 1) {
+            // Retour à la saisie actuelle
+            historyIndex = commandesTapees.size();
+            System.out.println("🔄 Retour à la saisie actuelle: '" + currentInput + "'");
+            
+            // ✅ Désactiver temporairement le listener
+            isNavigatingHistory = true;
+            prompt.setValue(currentInput);
+            isNavigatingHistory = false;
+            
+            prompt.getElement().executeJs("this.setSelectionRange(this.value.length, this.value.length)");
+        }
+    }
+
+    // ✅ Nouvelle méthode pour exécuter les commandes
+    private void executeCommand(String command) {
+        playCmd.stop();
+        
+        // ✅ Ajouter à l'historique
+        addToHistory(command);
+
+        String commandKey = command.split(" ")[0];
+        Command commandObj = commandMap.getOrDefault(commandKey, null);
+
+        if (commandObj != null) {
+            commandObj.execute(command);
+        } else {
+            FeedbackUtils.showError("Commande inconnue : \"" + commandKey + "\"");
+        }
+        
+        // ✅ Vider le champ après exécution
+        prompt.setValue("");
+    }
     public List<SocialMediaPost> fetchPostsFromTag(String tag) {
         return fetchPostsFromTag(tag, 40);
     }
@@ -242,63 +461,63 @@ public class MainView extends VerticalLayout {
         event.getFirstSelectedItem().ifPresent(this::selectAndDisplay);
     }
 
-public void selectAndDisplay(SocialMediaPost post) {
-    grid.select(post);
-    contentDiv.removeAll();
-
-    if (post != null) {
-        VerticalLayout container = new VerticalLayout();
-        container.setWidthFull();
-        container.setSpacing(false);
-
-        PlatformBadge largeBadge = new PlatformBadge(post, PlatformBadge.Size.LARGE, PlatformBadge.Style.BADGE);
-        HorizontalLayout platformHeader = new HorizontalLayout(largeBadge);
-        container.add(platformHeader);
-
-        HorizontalLayout header = new HorizontalLayout();
-        header.setWidthFull();
-        header.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
-        header.setAlignItems(FlexComponent.Alignment.START);
-
-        VerticalLayout userInfo = new VerticalLayout();
-        userInfo.setSpacing(false);
-        userInfo.setPadding(false);
-
-        Div displayNameDiv = new Div();
-        displayNameDiv.getStyle().set("font-weight", "bold");
-        displayNameDiv.setText(post.getDisplayName());
-
-        Div platformDiv = new Div();
-        platformDiv.getStyle().set("color", "orange");
-        platformDiv.setText(post.getPlatformInfo());
-
-        Div dateDiv = new Div();
-        dateDiv.getStyle().set("color", "gray");
-        dateDiv.getStyle().set("font-size", "0.9em");
-        dateDiv.getStyle().set("margin-top", "4px");
-        dateDiv.setText("📅 " + post.getFormattedDate());
-
-        userInfo.add(displayNameDiv, platformDiv, dateDiv); 
-
-        Div scoreDiv = new Div();
-        scoreDiv.getStyle().set("font-size", "0.8em");
-        scoreDiv.getStyle().set("color", "gray");
-        scoreDiv.setText(post.getScoreText());
-
-        header.add(userInfo, scoreDiv);
-        container.add(header);
-        
-        Div postContent = new Div();
-        postContent.getElement().setProperty("innerHTML", post.getContent());
-        container.add(postContent);
-        
-        Div engagementDiv = new Div();
-        engagementDiv.setText(post.getEngagementText());
-        container.add(engagementDiv);
-
+    public void selectAndDisplay(SocialMediaPost post) {
+        grid.select(post);
         contentDiv.removeAll();
-        contentDiv.add(container);
-        grid.setDetailsVisible(post, true);
+
+        if (post != null) {
+            VerticalLayout container = new VerticalLayout();
+            container.setWidthFull();
+            container.setSpacing(false);
+
+            PlatformBadge largeBadge = new PlatformBadge(post, PlatformBadge.Size.LARGE, PlatformBadge.Style.BADGE);
+            HorizontalLayout platformHeader = new HorizontalLayout(largeBadge);
+            container.add(platformHeader);
+
+            HorizontalLayout header = new HorizontalLayout();
+            header.setWidthFull();
+            header.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+            header.setAlignItems(FlexComponent.Alignment.START);
+
+            VerticalLayout userInfo = new VerticalLayout();
+            userInfo.setSpacing(false);
+            userInfo.setPadding(false);
+
+            Div displayNameDiv = new Div();
+            displayNameDiv.getStyle().set("font-weight", "bold");
+            displayNameDiv.setText(post.getDisplayName());
+
+            Div platformDiv = new Div();
+            platformDiv.getStyle().set("color", "orange");
+            platformDiv.setText(post.getPlatformInfo());
+
+            Div dateDiv = new Div();
+            dateDiv.getStyle().set("color", "gray");
+            dateDiv.getStyle().set("font-size", "0.9em");
+            dateDiv.getStyle().set("margin-top", "4px");
+            dateDiv.setText("📅 " + post.getFormattedDate());
+
+            userInfo.add(displayNameDiv, platformDiv, dateDiv); 
+
+            Div scoreDiv = new Div();
+            scoreDiv.getStyle().set("font-size", "0.8em");
+            scoreDiv.getStyle().set("color", "gray");
+            scoreDiv.setText(post.getScoreText());
+
+            header.add(userInfo, scoreDiv);
+            container.add(header);
+            
+            Div postContent = new Div();
+            postContent.getElement().setProperty("innerHTML", post.getContent());
+            container.add(postContent);
+            
+            Div engagementDiv = new Div();
+            engagementDiv.setText(post.getEngagementText());
+            container.add(engagementDiv);
+
+            contentDiv.removeAll();
+            contentDiv.add(container);
+            grid.setDetailsVisible(post, true);
+        }
     }
-}
 }
