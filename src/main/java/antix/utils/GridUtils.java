@@ -56,7 +56,7 @@ public static void addPlatformColumn(Grid<SocialMediaPost> grid) {
         return container;
     })
     .setWidth("60px")        // ✅ Largeur fixe pour la colonne
-    .setFlexGrow(1)         // ✅ Empêche l'expansion automatique
+    .setFlexGrow(0)         // ✅ Empêche l'expansion automatique
     .setHeader("P");
 }
 
@@ -86,7 +86,7 @@ public static void addPlatformColumn(Grid<SocialMediaPost> grid) {
             contentPreview.setWidthFull();
             contentPreview.getStyle().set("white-space", "normal").set("word-break", "break-word");
 
-            Span scoreSpan = new Span(post.getScoreText());
+            Span scoreSpan = new Span(post.getEngagementText());
             scoreSpan.addClassName("post-date");
             scoreSpan.getStyle().setColor("gray").setFontSize("small");
 

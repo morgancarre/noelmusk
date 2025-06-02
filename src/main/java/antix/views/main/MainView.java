@@ -4,6 +4,7 @@ import antix.factory.CommandFactory;
 import antix.model.SocialMediaPost;
 import antix.service.MastodonService;
 import antix.service.RedditService;
+import antix.utils.FeedbackUtils;
 import antix.utils.GridUtils;
 import antix.components.PlatformBadge;
 import antix.views.main.commands.Command;
@@ -148,8 +149,7 @@ public class MainView extends VerticalLayout {
             if (command != null) {
                 command.execute(text);
             } else {
-                Notification notification = Notification.show("Commande inconnue : \"" + commandKey + "\"", 1000, Notification.Position.TOP_END);
-                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                FeedbackUtils.showError("Commande inconnue : \"" + commandKey + "\"");
             }
             prompt.setValue("");
         });
@@ -218,13 +218,7 @@ public class MainView extends VerticalLayout {
         } catch (Exception e) {
             System.out.println("❌ ERREUR lors de la récupération des posts: " + e.getMessage());
             logger.log(Level.SEVERE, "Erreur lors de la récupération des posts", e);
-            
-            Notification notification = Notification.show(
-                "Erreur lors de la récupération des posts : " + e.getMessage(), 
-                3000, 
-                Notification.Position.TOP_END
-            );
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            FeedbackUtils.showError("Erreur lors de la récupération des posts : " + e.getMessage());
             
             return new ArrayList<>();
         }
