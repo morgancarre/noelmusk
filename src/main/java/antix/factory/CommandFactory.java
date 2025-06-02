@@ -58,6 +58,7 @@ public class CommandFactory {
         addCommands(new SortCommand(grid, selector), commands);
         addCommands(new TagListCommand(grid, contentDiv), commands);
         addCommands(new HistoryCommand(grid, selector, commandesTapees, contentDiv), commands);
+        addCommands(new OpenCommand(grid, contentDiv), commands);
         return commands;
     }
 

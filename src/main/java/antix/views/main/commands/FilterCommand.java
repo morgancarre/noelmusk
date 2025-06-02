@@ -28,10 +28,10 @@ public class FilterCommand extends Command {
      */
     public FilterCommand(Grid<SocialMediaPost> grid, PostSelector selector) {
         super(
-                List.of("f", "filter"),
+                List.of("filter"),
                 "Filter",
                 """
-                        💬 f / filter <attribut> > / < <n>
+                        💬 filter <attribut> > / < <n>
 
                         💡 Filtrer les posts ayant plus ou moins n attributs
                         Exemple : filter replies > 10 ou filter likes > 5.
