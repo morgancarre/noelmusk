@@ -240,11 +240,130 @@ public class MainView extends VerticalLayout {
         setFlexGrow(0, promptContainer);
 
         grid.addSelectionListener(event -> selectItemListener(grid, contentDiv, event));
+        
+        // --- ONBOARDING OVERLAY ---
+        Div onboardingOverlay = new Div();
+        onboardingOverlay.setId("onboarding-overlay");
+        onboardingOverlay.getStyle().set("position", "fixed");
+        onboardingOverlay.getStyle().set("top", "0");
+        onboardingOverlay.getStyle().set("left", "0");
+        onboardingOverlay.getStyle().set("width", "100vw");
+        onboardingOverlay.getStyle().set("height", "100vh");
+        onboardingOverlay.getStyle().set("background", "rgba(37,40,57,0.98)");
+        onboardingOverlay.getStyle().set("z-index", "2147483647");
+        onboardingOverlay.getStyle().set("display", "flex");
+        onboardingOverlay.getStyle().set("flex-direction", "column");
+        onboardingOverlay.getStyle().set("align-items", "center");
+        onboardingOverlay.getStyle().set("justify-content", "center");
+        onboardingOverlay.getStyle().set("cursor", "pointer");
+        onboardingOverlay.getStyle().set("color", "white");
+        onboardingOverlay.getStyle().set("padding", "40px");
+
+        // Génération dynamique du tableau des commandes
+        StringBuilder tableHtml = new StringBuilder();
+        tableHtml.append("""
+        <div id='onboarding-overlay' style='
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 9999;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+        '>
+            <div style='
+                width: 100%;
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 20px;
+                background: #1e1e2f;
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+                color: #f0f0f0;
+                font-family: sans-serif;
+            '>
+                <h2 style='margin-top: 0; text-align: center; color: #fff'>Bienvenue 👋</h2>
+                <p style='text-align: center; margin-bottom: 24px; font-size: 1.1em'>
+                    Voici la liste des commandes disponibles :
+                </p>
+                <div style='overflow-x: auto'>
+                    <table style='width: 100%; border-collapse: collapse;'>
+                        <thead>
+                            <tr style='background: #2a2a3b;'>
+                                <th style='padding: 12px 10px; text-align: left; border-bottom: 2px solid #444;'>Nom</th>
+                                <th style='padding: 12px 10px; text-align: left; border-bottom: 2px solid #444;'>Alias</th>
+                                <th style='padding: 12px 10px; text-align: left; border-bottom: 2px solid #444;'>Définition</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+        """);
+
+        Set<String> dejaVu = new HashSet<>();
+        for (Command cmd : commandMap.values()) {
+            String uniqueKey = String.join(",", cmd.getTitle());
+            if (dejaVu.contains(uniqueKey)) continue;
+            dejaVu.add(uniqueKey);
+
+            String noms = String.join(", ", cmd.getTitle());
+            List<String> alias = cmd.getAliases();
+            String fonctionnement = cmd.getDescription() != null ? cmd.getDescription() : "";
+
+            tableHtml.append("<tr>");
+            tableHtml.append("<td style='padding:8px 8px;border-bottom:1px solid #333;'>").append(noms).append("</td>");
+            tableHtml.append("<td style='padding:8px 8px;border-bottom:1px solid #333;'>").append(alias).append("</td>");
+            tableHtml.append("<td style='padding:8px 8px;border-bottom:1px solid #333;'>").append(fonctionnement).append("</td>");
+            tableHtml.append("</tr>");
+        }
+
+        tableHtml.append("""
+                </tbody>
+            </table>
+            </div> <!-- fermeture du div overflow-x:auto -->
+            <div style='margin-top:2em; font-size:1em; color:#aaa; text-align:center'>
+                <b>Astuce :</b> Utilisez les flèches haut/bas pour naviguer dans l'historique des commandes.<br>
+                <b>Astuce :</b> Cliquez n'importe où sur cette fenêtre pour commencer à utiliser le site.
+            </div>
+            </div>
+            <style>
+                #onboarding-overlay table {
+                    table-layout: auto;
+                    min-width: 700px;
+                    max-width: 1100px;
+                    font-size: 0.98em;
+                }
+                #onboarding-overlay th, #onboarding-overlay td {
+                    word-break: break-word;
+                    white-space: pre-line;
+                    padding: 8px 8px;
+                }
+                #onboarding-overlay th {
+                    background: #23253a;
+                }
+                #onboarding-overlay {
+                    overflow-y: auto;
+                }
+                @media (max-width: 900px) {
+                    #onboarding-overlay table {
+                        min-width: 500px;
+                        font-size: 0.93em;
+                    }
+                }
+            </style>
+""");
+
+        onboardingOverlay.getElement().setProperty("innerHTML", tableHtml.toString());
+
+        UI.getCurrent().getElement().appendChild(onboardingOverlay.getElement());
+
+        onboardingOverlay.addClickListener(e -> {
+            onboardingOverlay.getElement().removeFromParent();
+        });
+
     }
 
-    // ✅ Nouvelles méthodes pour la navigation dans l'historique
-    
-    // Méthode pour gérer les touches flèches
     private void handleKeyDown(KeyDownEvent event) {
         System.out.println("🔍 Touche détectée: " + event.getKey());
         System.out.println("📚 Historique actuel: " + commandesTapees.size() + " commandes");
