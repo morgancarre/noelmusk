@@ -523,7 +523,7 @@ public class MainView extends VerticalLayout {
         prompt.setValue("");
     }
     public List<SocialMediaPost> fetchPostsFromTag(String tag) {
-        return fetchPostsFromTag(tag, 40);
+        return fetchPostsFromTag(tag, 80);
     }
 
     public List<SocialMediaPost> fetchPostsFromTag(String tag, int maxPerService) {
