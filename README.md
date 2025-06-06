@@ -55,8 +55,6 @@
 - `views.main` : vues principales de l’application côté serveur.
 - `views.main.commands` : commandes spécifiques accessibles via l’interface (ex : navigation, tri, recherche, etc.).
 
----
-
 ## ⚙️ Lancer le projet
 
 ### Prérequis
