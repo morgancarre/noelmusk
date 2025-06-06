@@ -24,7 +24,9 @@
 - Ajout des premières commandes de navigation : `Goto`, `Top`, `Bottom`, `Next`, `Previous`, `Play`.
 - Implémentation de fonctionnalités diverses : `Link`, `RepliesGreater`, `SortReplies`, `Help`, etc.
 - Optimisation des appels à l’API Mastodon.
-- Mise en place d’un système de notifications.
+- Désactivation du clic et du scroll sur la page
+- Affichage des posts dans une grille interactive.
+- Système de notifications utilisateur.
 
 ### 🚧 Version 2
 - Amélioration des commandes `Top` et `Bottom` pour une navigation plus fluide.
@@ -53,7 +55,18 @@
 - `views.main` : vues principales de l’application côté serveur.
 - `views.main.commands` : commandes spécifiques accessibles via l’interface (ex : navigation, tri, recherche, etc.).
 
+---
+
 ## ⚙️ Lancer le projet
-Pour démarrer l'application en local :
+
+### Prérequis
+- Java 17+
+- Maven 3.6+
+- Navigateur web moderne
+
+### Lancement
 ```bash
+git clone https://github.com/morgancarre/noelmusk.git
+cd noelmusk
 mvn spring-boot:run
+```
