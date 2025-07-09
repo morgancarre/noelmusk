@@ -147,7 +147,6 @@ public class HashtagCommand extends Command {
         }
 
         List<SocialMediaPost> finalList = result.stream()
-                .limit(40)
                 .sorted(Comparator.comparing(SocialMediaPost::getId).reversed())
                 .collect(Collectors.toList());
 
